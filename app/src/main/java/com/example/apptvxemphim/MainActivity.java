@@ -1,5 +1,6 @@
 package com.example.apptvxemphim;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -21,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
+
+        // Ép ứng dụng tự động mở màn hình của bạn lên điện thoại thật
+//        Intent intent = new Intent(MainActivity.this, com.example.apptvxemphim.ShowtimeSelectionActivity.class);
+//        startActivity(intent);
+//        finish(); // Thêm dòng này để đóng hẳn MainActivity lại, không cho chạy mống code phía dưới nữa
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
