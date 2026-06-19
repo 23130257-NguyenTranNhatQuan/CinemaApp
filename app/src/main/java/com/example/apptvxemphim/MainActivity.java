@@ -2,14 +2,26 @@ package com.example.apptvxemphim;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private RecyclerView rcvMovies;
+    private MovieAdapter movieAdapter;
+    private List<Movie> movieList;
 
     BottomNavigationView bottomNavigationView;
 
@@ -26,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         // Ép ứng dụng tự động mở màn hình của bạn lên điện thoại thật
         Intent intent = new Intent(MainActivity.this, com.example.apptvxemphim.SeatSelectionActivity.class);
         startActivity(intent);
-        finish(); // Thêm dòng này để đóng hẳn MainActivity lại, không cho chạy mống code phía dưới nữa
+
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -51,6 +63,33 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+        });
+
+        rcvMovies = findViewById(R.id.rcv_movies);
+        rcvMovies.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        movieList = new ArrayList<>();
+        movieAdapter = new MovieAdapter(movieList);
+        rcvMovies.setAdapter(movieAdapter);
+
+        // 2. Kéo dữ liệu từ Firebase
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("Movie").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Xóa list cũ trước khi thêm mới để không bị trùng
+                movieList.clear();
+
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    // Firebase có hàm cực hay: Tự động map dữ liệu thành Class Java
+                    Movie movie = document.toObject(Movie.class);
+                    movieList.add(movie);
+                }
+
+                // Báo cho Adapter biết dữ liệu đã tải xong để nó vẽ lên màn hình
+                movieAdapter.notifyDataSetChanged();
+            } else {
+                Log.w("FirebaseTest", "Lỗi lấy dữ liệu", task.getException());
             }
         });
     }

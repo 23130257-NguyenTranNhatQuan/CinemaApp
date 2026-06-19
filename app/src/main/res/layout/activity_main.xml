@@ -40,17 +40,11 @@
                 android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_gallery" />
 
-            <ImageView
-                android:id="@+id/img_movie_poster"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcv_movies"
                 android:layout_width="match_parent"
-                android:layout_height="450dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="24dp"
-                android:background="@color/gray"
-                android:scaleType="centerCrop"
-                android:src="@android:drawable/ic_menu_report_image" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"/>
 
         </LinearLayout>
     </ScrollView>
