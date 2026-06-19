@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590586581626",
+    "project_id": "cinemaapp-90dfa",
+    "storage_bucket": "cinemaapp-90dfa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590586581626:android:0f574e1c2746114c06e1c3",
+        "android_client_info": {
+          "package_name": "com.example.apptvxemphim"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC76TaUqg0g2s6c8BBhwfC7uVtBU_7dVUc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
