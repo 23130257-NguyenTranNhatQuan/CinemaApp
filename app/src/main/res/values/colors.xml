@@ -4,4 +4,12 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#9E9E9E</color>
     <color name="bg_main">#372458</color>
+
+    <color name="bg_cinema_dark">#1A1919</color>
+    <color name="primary_pink">#C9227A</color>
+
+    <color name="seat_normal">#722ED1</color>  <color name="seat_vip">#F5222D</color>     <color name="seat_double">#EB2F96</color>  <color name="seat_booked">#434343</color>  <color name="seat_selected">#FF00A0</color><color name="text_white">#FFFFFF</color>
+    <color name="text_gray">#A6A6A6</color>
+
+    <color name="center_zone_border">#2F6946</color>
 </resources>
