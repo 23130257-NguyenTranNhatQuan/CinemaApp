@@ -24,9 +24,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Ép ứng dụng tự động mở màn hình của bạn lên điện thoại thật
-//        Intent intent = new Intent(MainActivity.this, com.example.apptvxemphim.ShowtimeSelectionActivity.class);
-//        startActivity(intent);
-//        finish(); // Thêm dòng này để đóng hẳn MainActivity lại, không cho chạy mống code phía dưới nữa
+        Intent intent = new Intent(MainActivity.this, com.example.apptvxemphim.SeatSelectionActivity.class);
+        startActivity(intent);
+        finish(); // Thêm dòng này để đóng hẳn MainActivity lại, không cho chạy mống code phía dưới nữa
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 

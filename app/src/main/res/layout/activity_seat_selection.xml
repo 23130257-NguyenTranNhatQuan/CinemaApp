@@ -1,95 +1,252 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1C1C1E">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/bg_cinema_dark"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/topBar"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#D11764"
-        android:gravity="center"
-        android:orientation="horizontal">
+        android:background="@color/primary_pink"
+        android:paddingHorizontal="16dp">
+
+        <TextView
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="&#8249;"
+            android:textColor="@color/text_white"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:paddingEnd="8dp" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="Mua vé xem phim"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textSize="18sp"/>
-    </LinearLayout>
+            android:textColor="@color/text_white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
-    <TextView
-        android:id="@+id/tvScreen"
-        android:layout_width="200dp"
-        android:layout_height="30dp"
-        android:layout_below="@id/topBar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:background="#3A3A3C"
-        android:text="MÀN HÌNH"
-        android:textColor="#AEAEB2"
-        android:gravity="center"
-        android:textSize="12sp"/>
+    <com.otaliastudios.zoom.ZoomLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+
+        app:minZoom="1"
+        app:maxZoom="3"
+        app:minZoomType="zoom"
+        app:maxZoomType="zoom"
+        app:overScrollHorizontal="false"
+        app:overScrollVertical="false"
+        app:hasClickableChildren="true"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="MÀN HÌNH"
+                android:textColor="@color/text_gray"
+                android:textSize="5sp" />
+
+            <View
+                android:layout_width="60dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="12dp"
+                android:background="@color/text_white" />
+
+
+
+            <com.example.apptvxemphim.SeatMapView
+                android:id="@+id/seatMapView"
+                android:layout_width="match_parent"
+                android:layout_height="70dp" />
+
+
+
+        </LinearLayout>
+
+    </com.otaliastudios.zoom.ZoomLayout>
 
     <GridLayout
-        android:id="@+id/gridSeats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvScreen"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:columnCount="5"
-        android:rowCount="3">
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:columnCount="3"
+        android:alignmentMode="alignBounds">
 
-        <Button android:layout_width="45dp" android:layout_height="45dp" android:text="A1" android:backgroundTint="#5856D6" android:layout_margin="4dp" android:textSize="10sp"/>
-        <Button android:layout_width="45dp" android:layout_height="45dp" android:text="A2" android:backgroundTint="#5856D6" android:layout_margin="4dp" android:textSize="10sp"/>
-        <Button android:layout_width="45dp" android:layout_height="45dp" android:text="A3" android:backgroundTint="#5856D6" android:layout_margin="4dp" android:textSize="10sp"/>
-        <Button android:layout_width="45dp" android:layout_height="45dp" android:text="B1" android:backgroundTint="#FF3B30" android:layout_margin="4dp" android:textSize="10sp"/>
-        <Button android:layout_width="45dp" android:layout_height="45dp" android:text="B2" android:backgroundTint="#FF3B30" android:layout_margin="4dp" android:textSize="10sp"/>
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <View android:layout_width="18dp" android:layout_height="18dp" android:background="@color/seat_booked"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Đã đặt" android:textColor="@color/text_white" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <View android:layout_width="18dp" android:layout_height="18dp" android:background="@color/primary_pink"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Ghế bạn chọn" android:textColor="@color/text_white" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <View android:layout_width="18dp" android:layout_height="18dp" android:background="@color/seat_normal"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Ghế thường" android:textColor="@color/text_white" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <View android:layout_width="18dp" android:layout_height="18dp" android:background="@color/seat_vip"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Ghế VIP" android:textColor="@color/text_white" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <View android:layout_width="18dp" android:layout_height="18dp" android:background="@color/seat_double"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Ghế đôi" android:textColor="@color/text_white" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+            <FrameLayout android:layout_width="18dp" android:layout_height="18dp">
+                <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg_cinema_dark"/>
+                <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:src="@android:drawable/dialog_frame" android:layout_margin="1dp" app:tint="@color/center_zone_border"/>
+            </FrameLayout>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text=" Vùng trung tâm" android:textColor="@color/text_white" android:textSize="12sp"/>
+        </LinearLayout>
+
     </GridLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="Xem chi tiết hình ảnh và thông tin ghế"
+        android:textColor="@color/text_white"
+        android:textSize="13sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:weightSum="2">
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Toy Story 5"
+                android:background="#4CAF50"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:text="P"
+                android:textColor="@color/text_white"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:textSize="16sp"/>
+                android:textSize="14sp" />
+
             <TextView
-                android:id="@+id/tvTotalPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tạm tính: 0đ"
-                android:textColor="#D11764"
-                android:textSize="14sp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginStart="8dp"
+                android:text="Toy Story 5"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnBuyTicket"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Mua vé"
-            android:backgroundTint="#D11764"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"/>
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="09:00 ~ 10:42 · Hôm nay, 19/06 · Phòng chiếu P2 · 2D Lồng tiếng"
+            android:textColor="#FF7A00"
+            android:textSize="13sp" />
 
-</RelativeLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvSelectedSeatNames"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chỗ ngồi"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp" />
+
+                    <ImageButton
+                        android:id="@+id/btnClearSeats"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="6dp"
+                        android:src="@android:drawable/ic_menu_close_clear_cancel"
+                        android:background="@color/primary_pink"
+                        app:tint="@color/text_white"
+                        android:visibility="gone"
+                        android:contentDescription="Xóa chọn ghế" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tạm tính"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvTotalPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0đ"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnBuyTicket"
+                android:layout_width="140dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:backgroundTint="@color/primary_pink"
+                android:text="Mua vé"
+                android:textColor="@color/text_white"
+                android:textStyle="bold" />
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>
