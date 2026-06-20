@@ -16,17 +16,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main); // Gọi file giao diện XML
+
+        // Chỉ cần gọi giao diện XML lên là đủ
+        setContentView(R.layout.activity_main);
 
         // Ẩn thanh Action Bar mặc định đi cho giống app thật
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
-        // Ép ứng dụng tự động mở màn hình của bạn lên điện thoại thật
-        Intent intent = new Intent(MainActivity.this, com.example.apptvxemphim.SeatSelectionActivity.class);
-        startActivity(intent);
-        finish(); // Thêm dòng này để đóng hẳn MainActivity lại, không cho chạy mống code phía dưới nữa
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -36,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
 
-                // Dùng if-else để tương thích tốt với các phiên bản Gradle mới
                 if (id == R.id.nav_home) {
                     Toast.makeText(MainActivity.this, "Đang ở Trang chủ", Toast.LENGTH_SHORT).show();
                     return true;
@@ -47,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Chuyển sang Tin tức", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == R.id.nav_account) {
-                    Toast.makeText(MainActivity.this, "Chuyển sang Tài khoản", Toast.LENGTH_SHORT).show();
+                    // Đã thay đổi thành chuyển sang ProfileActivity
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    startActivity(intent);
                     return true;
                 }
                 return false;
