@@ -1,23 +1,23 @@
 package com.example.apptvxemphim;
 
+import com.google.firebase.Timestamp;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 public class Movie {
     private String title;
     private long duration;
     private String description;
     private String poster;
-    private String genre;
-    private String ageRating;
+    private List<String> genres;
+    private String age;
+    private String format;
+    private Timestamp releaseDate;
 
     public Movie(){}
-
-    public Movie(String title, long duration, String description, String poster, String genre, String ageRating) {
-        this.title = title;
-        this.duration = duration;
-        this.description = description;
-        this.poster = poster;
-        this.genre = genre;
-        this.ageRating = ageRating;
-    }
 
     public String getTitle() {
         return title;
@@ -51,19 +51,45 @@ public class Movie {
         this.poster = poster;
     }
 
-    public String getGenre() {
-        return genre;
+    public List<String> getGenres() {
+        return genres;
     }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
     }
 
-    public String getAgeRating() {
-        return ageRating;
+    public String getAge() {
+        return age;
     }
 
-    public void setAgeRating(String ageRating) {
-        this.ageRating = ageRating;
+    public void setAge(String age) {
+        this.age = age;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public Timestamp getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(Timestamp releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    // Helper method to get formatted release date string
+    public String getFormattedReleaseDate() {
+        if (releaseDate != null) {
+            Date date = releaseDate.toDate();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            return sdf.format(date);
+        }
+        return "";
     }
 }

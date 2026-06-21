@@ -1,10 +1,8 @@
 package com.example.apptvxemphim;
 
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,39 +32,34 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         Movie movie = movieList.get(position);
         if (movie == null) return;
 
+        // Dòng 1: Tên phim
         holder.tvTitle.setText(movie.getTitle());
-        
-        // Format genre and duration
-        String genreDuration = movie.getGenre() + " • " + formatDuration(movie.getDuration());
-        holder.tvGenreDuration.setText(genreDuration);
-        
-        // Set age rating
-        holder.tvAgeRating.setText(movie.getAgeRating());
-        
-        // Set format (2D/3D) - you can add this field to Movie class if needed
-        holder.tvFormat.setText("2D");
+
+        // Dòng 2: Thể loại (genres array -> join thành chuỗi)
+        if (movie.getGenres() != null && !movie.getGenres().isEmpty()) {
+            String genresStr = String.join(", ", movie.getGenres());
+            holder.tvGenre.setText(genresStr);
+        } else {
+            holder.tvGenre.setText("Đang cập nhật");
+        }
+
+        // Dòng 3: Format (2D/3D) và ô màu vàng (độ tuổi)
+        if (movie.getFormat() != null && !movie.getFormat().isEmpty()) {
+            holder.tvFormat.setText(movie.getFormat());
+        } else {
+            holder.tvFormat.setText("2D");
+        }
+        if (movie.getAge() != null && !movie.getAge().isEmpty()) {
+            holder.tvAgeRating.setText(movie.getAge());
+        } else {
+            holder.tvAgeRating.setText("K");
+        }
 
         Glide.with(holder.itemView.getContext())
                 .load(movie.getPoster())
                 .placeholder(android.R.drawable.ic_menu_report_image)
                 .error(android.R.drawable.ic_menu_report_image)
                 .into(holder.imgPoster);
-
-        // Set click listener for book button
-        holder.btnBook.setOnClickListener(v -> {
-            // Handle book ticket click
-            // You can start SeatSelectionActivity here
-        });
-    }
-
-    private String formatDuration(long duration) {
-        // Assuming duration is in minutes
-        long hours = duration / 60;
-        long minutes = duration % 60;
-        if (hours > 0) {
-            return hours + " giờ " + minutes + " phút";
-        }
-        return minutes + " phút";
     }
 
     @Override
@@ -77,19 +70,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPoster;
         TextView tvTitle;
-        TextView tvGenreDuration;
+        TextView tvGenre;
         TextView tvAgeRating;
         TextView tvFormat;
-        Button btnBook;
 
         public MovieViewHolder(@NonNull View itemView) {
             super(itemView);
             imgPoster = itemView.findViewById(R.id.img_poster);
             tvTitle = itemView.findViewById(R.id.tv_title);
-            tvGenreDuration = itemView.findViewById(R.id.tv_genre_duration);
+            tvGenre = itemView.findViewById(R.id.tv_genre);
             tvAgeRating = itemView.findViewById(R.id.tv_age_rating);
             tvFormat = itemView.findViewById(R.id.tv_format);
-            btnBook = itemView.findViewById(R.id.btn_book);
         }
     }
 }
