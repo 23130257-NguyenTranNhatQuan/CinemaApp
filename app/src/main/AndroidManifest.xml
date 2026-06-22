@@ -24,6 +24,7 @@
 
         <activity android:name=".ShowtimeSelectionActivity" android:exported="false" />
         <activity android:name=".SeatSelectionActivity" android:exported="false" />
+        <activity android:name=".MovieDetailActivity" android:exported="false" />
 
     </application>
 

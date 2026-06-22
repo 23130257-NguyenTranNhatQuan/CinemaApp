@@ -1,5 +1,6 @@
 package com.example.apptvxemphim;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 .placeholder(android.R.drawable.ic_menu_report_image)
                 .error(android.R.drawable.ic_menu_report_image)
                 .into(holder.imgPoster);
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), MovieDetailActivity.class);
+            intent.putExtra("MOVIE_ID", movie.getId());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
