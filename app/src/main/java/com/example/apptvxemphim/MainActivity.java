@@ -1,5 +1,6 @@
 package com.example.apptvxemphim;
 
+import android.content.Intent; // Đã thêm thư viện Intent
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -78,7 +79,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Chuyển sang Tin tức", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == R.id.nav_account) {
-                    Toast.makeText(MainActivity.this, "Chuyển sang Tài khoản", Toast.LENGTH_SHORT).show();
+                    // ĐÃ SỬA LẠI: Chuyển thẳng sang trang ProfileActivity
+                    Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                    startActivity(intent);
                     return true;
                 }
                 return false;
@@ -87,12 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize banner ImageViews
         bannerImages = new ImageView[]{
-            findViewById(R.id.banner1),
-            findViewById(R.id.banner2),
-            findViewById(R.id.banner3),
-            findViewById(R.id.banner4)
+                findViewById(R.id.banner1),
+                findViewById(R.id.banner2),
+                findViewById(R.id.banner3),
+                findViewById(R.id.banner4)
         };
-        
+
         // Verify ImageViews were found
         for (int i = 0; i < bannerImages.length; i++) {
             if (bannerImages[i] == null) {
@@ -105,14 +108,14 @@ public class MainActivity extends AppCompatActivity {
         btnPrev = findViewById(R.id.btn_prev);
         btnNext = findViewById(R.id.btn_next);
         layoutDots = findViewById(R.id.layout_dots);
-        
+
         dots = new ImageView[]{
-            findViewById(R.id.dot1),
-            findViewById(R.id.dot2),
-            findViewById(R.id.dot3),
-            findViewById(R.id.dot4)
+                findViewById(R.id.dot1),
+                findViewById(R.id.dot2),
+                findViewById(R.id.dot3),
+                findViewById(R.id.dot4)
         };
-        
+
         // Verify dots were found
         for (int i = 0; i < dots.length; i++) {
             if (dots[i] == null) {
@@ -122,10 +125,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Load placeholder banners immediately so user sees something
         loadPlaceholderBanners();
-        
+
         // Then try to load from Firebase
         loadBannersFromFirebase();
-        
+
         setupDots(0);
         updateArrowsVisibility(0);
 
@@ -228,10 +231,10 @@ public class MainActivity extends AppCompatActivity {
     private void loadPlaceholderComingSoon() {
         comingSoonList.clear();
         String[] placeholderPosters = {
-            "https://via.placeholder.com/300x400/3F51B5/FFFFFF?text=Phim+Sap+Chieu+1",
-            "https://via.placeholder.com/300x400/009688/FFFFFF?text=Phim+Sap+Chieu+2",
-            "https://via.placeholder.com/300x400/FF5722/FFFFFF?text=Phim+Sap+Chieu+3",
-            "https://via.placeholder.com/300x400/607D8B/FFFFFF?text=Phim+Sap+Chieu+4"
+                "https://via.placeholder.com/300x400/3F51B5/FFFFFF?text=Phim+Sap+Chieu+1",
+                "https://via.placeholder.com/300x400/009688/FFFFFF?text=Phim+Sap+Chieu+2",
+                "https://via.placeholder.com/300x400/FF5722/FFFFFF?text=Phim+Sap+Chieu+3",
+                "https://via.placeholder.com/300x400/607D8B/FFFFFF?text=Phim+Sap+Chieu+4"
         };
         String[] titles = {"Phim Sắp Chiếu 1", "Phim Sắp Chiếu 2", "Phim Sắp Chiếu 3", "Phim Sắp Chiếu 4"};
 
@@ -247,16 +250,16 @@ public class MainActivity extends AppCompatActivity {
     private void loadPlaceholderNews() {
         newsList.clear();
         String[] placeholderImages = {
-            "https://via.placeholder.com/400x200/FF9800/FFFFFF?text=Uu+ Dai+1",
-            "https://via.placeholder.com/400x200/E91E63/FFFFFF?text=Uu+ Dai+2",
-            "https://via.placeholder.com/400x200/4CAF50/FFFFFF?text=Uu+ Dai+3",
-            "https://via.placeholder.com/400x200/9C27B0/FFFFFF?text=Uu+ Dai+4"
+                "https://via.placeholder.com/400x200/FF9800/FFFFFF?text=Uu+ Dai+1",
+                "https://via.placeholder.com/400x200/E91E63/FFFFFF?text=Uu+ Dai+2",
+                "https://via.placeholder.com/400x200/4CAF50/FFFFFF?text=Uu+ Dai+3",
+                "https://via.placeholder.com/400x200/9C27B0/FFFFFF?text=Uu+ Dai+4"
         };
         String[] names = {
-            "Ưu đãi đặc biệt cuối tuần - Giảm 30% vé xem phim",
-            "Mua 1 tặng 1 cho khách hàng thân thiết",
-            "Combo bỏng nước chỉ 49.000đ khi mua vé online",
-            "Sự kiện ra mắt phim mới - Nhận quà tặng hấp dẫn"
+                "Ưu đãi đặc biệt cuối tuần - Giảm 30% vé xem phim",
+                "Mua 1 tặng 1 cho khách hàng thân thiết",
+                "Combo bỏng nước chỉ 49.000đ khi mua vé online",
+                "Sự kiện ra mắt phim mới - Nhận quà tặng hấp dẫn"
         };
 
         for (int i = 0; i < placeholderImages.length; i++) {
@@ -286,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
                 // Update totalBanners to actual count
                 totalBanners = bannerList.size();
                 Log.d("FirebaseTest", "Total banners loaded: " + totalBanners);
-                
+
                 if (totalBanners > 0) {
                     // Load images into ImageViews
                     loadBannerImages();
@@ -305,16 +308,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     private void loadPlaceholderBanners() {
         // Fallback: Load placeholder banners if Firebase fails
         String[] placeholderUrls = {
-            "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+1",
-            "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+2",
-            "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+3",
-            "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+4"
+                "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+1",
+                "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+2",
+                "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+3",
+                "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+4"
         };
-        
+
         bannerList.clear();
         for (int i = 0; i < placeholderUrls.length; i++) {
             bannerList.add(new Banner(placeholderUrls[i], i));
@@ -330,12 +333,12 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < bannerImages.length && i < bannerList.size(); i++) {
             String imageUrl = bannerList.get(i).getBanner();
             Log.d("FirebaseTest", "Loading image " + i + ": " + imageUrl);
-            
+
             com.bumptech.glide.Glide.with(this)
-                .load(imageUrl)
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .error(android.R.drawable.ic_menu_gallery)
-                .into(bannerImages[i]);
+                    .load(imageUrl)
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .error(android.R.drawable.ic_menu_gallery)
+                    .into(bannerImages[i]);
         }
     }
 
