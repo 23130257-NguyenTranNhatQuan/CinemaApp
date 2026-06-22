@@ -38,53 +38,15 @@
             android:layout_marginTop="6dp" />
 
         <TextView
-            android:id="@+id/tv_genre"
+            android:id="@+id/tv_release_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Thể loại"
-            android:textColor="#CCCCCC"
+            android:text="Khởi chiếu: 01/01/2024"
+            android:textColor="@color/yellow"
             android:textSize="11sp"
             android:gravity="center"
-            android:layout_marginTop="2dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp">
-
-            <TextView
-                android:id="@+id/tv_format"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2D"
-                android:textColor="@color/white"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:background="@color/purple_light"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp" />
-
-            <TextView
-                android:id="@+id/tv_age_rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="K"
-                android:textColor="#333333"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:background="@color/yellow"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:layout_marginStart="6dp" />
-
-        </LinearLayout>
+            android:layout_marginBottom="4dp" />
 
     </LinearLayout>
 

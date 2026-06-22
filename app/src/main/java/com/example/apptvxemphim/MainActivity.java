@@ -1,6 +1,5 @@
 package com.example.apptvxemphim;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +31,15 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rcvMovies;
     private MovieAdapter movieAdapter;
     private List<Movie> movieList;
+
+    private RecyclerView rcvComingSoon;
+    private ComingSoonMovieAdapter comingSoonAdapter;
+    private List<Movie> comingSoonList;
+
+    private RecyclerView rcvNews;
+    private NewsAdapter newsAdapter;
+    private List<News> newsList;
+
     private ImageView[] bannerImages;
     private ImageButton btnPrev, btnNext;
     private LinearLayout layoutDots;
@@ -140,16 +148,52 @@ public class MainActivity extends AppCompatActivity {
             showBanner(currentPage);
         });
 
-        // Setup Movie List
+        // Setup Coming Soon Movies (horizontal)
+        rcvComingSoon = findViewById(R.id.rcv_coming_soon);
+        LinearLayoutManager horizontalLayout = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        rcvComingSoon.setLayoutManager(horizontalLayout);
+
+        comingSoonList = new ArrayList<>();
+        comingSoonAdapter = new ComingSoonMovieAdapter(comingSoonList);
+        rcvComingSoon.setAdapter(comingSoonAdapter);
+
+        // Setup Now Showing Movies (horizontal)
         rcvMovies = findViewById(R.id.rcv_movies);
-        rcvMovies.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rcvMovies.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         movieList = new ArrayList<>();
         movieAdapter = new MovieAdapter(movieList);
         rcvMovies.setAdapter(movieAdapter);
 
-        // Load dữ liệu từ Firebase
+        // Setup News
+        rcvNews = findViewById(R.id.rcv_news);
+        rcvNews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        newsList = new ArrayList<>();
+        newsAdapter = new NewsAdapter(newsList);
+        rcvNews.setAdapter(newsAdapter);
+
+        // Load data from Firebase
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Load coming soon movies from "ComingMovie" collection
+        db.collection("ComingMovie").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                comingSoonList.clear();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Movie movie = document.toObject(Movie.class);
+                    comingSoonList.add(movie);
+                }
+                comingSoonAdapter.notifyDataSetChanged();
+                Log.d("FirebaseTest", "Loaded " + comingSoonList.size() + " coming soon movies");
+            } else {
+                Log.w("FirebaseTest", "Lỗi lấy dữ liệu phim sắp chiếu", task.getException());
+                // Load placeholder data if Firebase fails
+                loadPlaceholderComingSoon();
+            }
+        });
+
+        // Load now showing movies from "Movie" collection
         db.collection("Movie").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 movieList.clear();
@@ -159,9 +203,69 @@ public class MainActivity extends AppCompatActivity {
                 }
                 movieAdapter.notifyDataSetChanged();
             } else {
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu", task.getException());
+                Log.w("FirebaseTest", "Lỗi lấy dữ liệu phim đang chiếu", task.getException());
             }
         });
+
+        // Load news from "News" collection
+        db.collection("News").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                newsList.clear();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    News news = document.toObject(News.class);
+                    newsList.add(news);
+                }
+                newsAdapter.notifyDataSetChanged();
+                Log.d("FirebaseTest", "Loaded " + newsList.size() + " news items");
+            } else {
+                Log.w("FirebaseTest", "Lỗi lấy dữ liệu tin tức", task.getException());
+                // Load placeholder news if Firebase fails
+                loadPlaceholderNews();
+            }
+        });
+    }
+
+    private void loadPlaceholderComingSoon() {
+        comingSoonList.clear();
+        String[] placeholderPosters = {
+            "https://via.placeholder.com/300x400/3F51B5/FFFFFF?text=Phim+Sap+Chieu+1",
+            "https://via.placeholder.com/300x400/009688/FFFFFF?text=Phim+Sap+Chieu+2",
+            "https://via.placeholder.com/300x400/FF5722/FFFFFF?text=Phim+Sap+Chieu+3",
+            "https://via.placeholder.com/300x400/607D8B/FFFFFF?text=Phim+Sap+Chieu+4"
+        };
+        String[] titles = {"Phim Sắp Chiếu 1", "Phim Sắp Chiếu 2", "Phim Sắp Chiếu 3", "Phim Sắp Chiếu 4"};
+
+        for (int i = 0; i < placeholderPosters.length; i++) {
+            Movie movie = new Movie();
+            movie.setTitle(titles[i]);
+            movie.setPoster(placeholderPosters[i]);
+            comingSoonList.add(movie);
+        }
+        comingSoonAdapter.notifyDataSetChanged();
+    }
+
+    private void loadPlaceholderNews() {
+        newsList.clear();
+        String[] placeholderImages = {
+            "https://via.placeholder.com/400x200/FF9800/FFFFFF?text=Uu+ Dai+1",
+            "https://via.placeholder.com/400x200/E91E63/FFFFFF?text=Uu+ Dai+2",
+            "https://via.placeholder.com/400x200/4CAF50/FFFFFF?text=Uu+ Dai+3",
+            "https://via.placeholder.com/400x200/9C27B0/FFFFFF?text=Uu+ Dai+4"
+        };
+        String[] names = {
+            "Ưu đãi đặc biệt cuối tuần - Giảm 30% vé xem phim",
+            "Mua 1 tặng 1 cho khách hàng thân thiết",
+            "Combo bỏng nước chỉ 49.000đ khi mua vé online",
+            "Sự kiện ra mắt phim mới - Nhận quà tặng hấp dẫn"
+        };
+
+        for (int i = 0; i < placeholderImages.length; i++) {
+            News news = new News();
+            news.setName(names[i]);
+            news.setPoster(placeholderImages[i]);
+            newsList.add(news);
+        }
+        newsAdapter.notifyDataSetChanged();
     }
 
     private void loadBannersFromFirebase() {
