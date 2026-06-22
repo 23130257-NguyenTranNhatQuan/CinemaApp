@@ -1,6 +1,7 @@
 package com.example.apptvxemphim;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentId;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,10 +9,13 @@ import java.util.List;
 import java.util.Locale;
 
 public class Movie {
+    @DocumentId
+    private String id;
     private String title;
     private long duration;
     private String description;
     private String poster;
+    private String trailer;
     private List<String> genres;
     private String age;
     private String format;
@@ -21,6 +25,22 @@ public class Movie {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTrailer() {
+        return trailer;
+    }
+
+    public void setTrailer(String trailer) {
+        this.trailer = trailer;
     }
 
     public void setTitle(String title) {
