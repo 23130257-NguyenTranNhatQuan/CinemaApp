@@ -11,13 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
+import com.bumptech.glide.Glide;
+import android.widget.ImageView;
 public class ShowtimeSelectionActivity extends AppCompatActivity {
 
-    LinearLayout btnDate17, btnDate18, btnDate19;
-    TextView tvNum17, tvTxt17, tvNum18, tvTxt18, tvNum19, tvTxt19;
-    LinearLayout btnBrandAll, btnBrandCGV, btnBrandBeta;
-    TextView imgAll, imgCGV, imgBeta;
+    LinearLayout layoutDateContainer;
+
     LinearLayout layoutCinemaList;
     LinearLayout btnLocation;
 
@@ -33,7 +32,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_showtime_selection);
-
+        layoutDateContainer = findViewById(R.id.layoutDateContainer);
         movieId = getIntent().getStringExtra("MOVIE_ID");
         if (movieId == null) {
             Toast.makeText(this, "Lỗi: Không có ID phim", Toast.LENGTH_SHORT).show();
@@ -44,25 +43,22 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         btnLocation      = findViewById(R.id.btnLocation);
-        btnDate17        = findViewById(R.id.btnDate17);
-        btnDate18        = findViewById(R.id.btnDate18);
-        btnDate19        = findViewById(R.id.btnDate19);
-        tvNum17 = findViewById(R.id.tvNum17); tvTxt17 = findViewById(R.id.tvTxt17);
-        tvNum18 = findViewById(R.id.tvNum18); tvTxt18 = findViewById(R.id.tvTxt18);
-        tvNum19 = findViewById(R.id.tvNum19); tvTxt19 = findViewById(R.id.tvTxt19);
-        btnBrandAll      = findViewById(R.id.btnBrandAll);
-        btnBrandCGV      = findViewById(R.id.btnBrandCGV);
-        btnBrandBeta     = findViewById(R.id.btnBrandBeta);
-        imgAll  = findViewById(R.id.imgAll);
-        imgCGV  = findViewById(R.id.imgCGV);
-        imgBeta = findViewById(R.id.imgBeta);
+
         layoutCinemaList = findViewById(R.id.layoutCinemaList);
 
-        btnBrandAll.setOnClickListener(v  -> { selectedBrand = "ALL";  highlightBrand("ALL");  renderCinemaList(); });
-        btnBrandCGV.setOnClickListener(v  -> { selectedBrand = "CGV";  highlightBrand("CGV");  renderCinemaList(); });
-        btnBrandBeta.setOnClickListener(v -> { selectedBrand = "BETA"; highlightBrand("BETA"); renderCinemaList(); });
+
 
         loadCinemas();
+
+        // Lấy tên phim từ Firebase
+        TextView tvMovieTitle = findViewById(R.id.tvMovieTitle);
+        db.collection("Movie").document(movieId).get()
+                .addOnSuccessListener(doc -> {
+                    if (doc.exists()) {
+                        String title = doc.getString("title");
+                        tvMovieTitle.setText("Lịch chiếu " + (title != null ? title : ""));
+                    }
+                });
     }
 
     private void loadCinemas() {
@@ -99,6 +95,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
                     }
 
                     availableDates.addAll(dateSet);
+                    buildBrandButtons();
                     buildDateButtons();
 
                     if (!availableDates.isEmpty()) {
@@ -111,34 +108,148 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
                         Toast.makeText(this, "Lỗi tải suất chiếu: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
+    private void buildBrandButtons() {
+        // Lấy LinearLayout chứa các nút hãng trong XML
+        LinearLayout brandContainer = findViewById(R.id.brandContainer); // tạo ID này ở bước sau
+        brandContainer.removeAllViews();
+
+        // Lấy danh sách hãng duy nhất từ cinemaMap của các showtime
+        Set<String> brands = new LinkedHashSet<>();
+        brands.add("ALL"); // luôn có nút Tất cả đầu tiên
+        for (Showtime st : allShowtimes) {
+            Cinema c = cinemaMap.get(st.getCinemaId());
+            if (c != null && c.getName() != null) {
+
+                String brandName = c.getBrand() != null ? c.getBrand() : c.getName().split(" ")[0];
+                brands.add(brandName);
+            }
+        }
+
+        for (String brand : brands) {
+            LinearLayout btnBrand = new LinearLayout(this);
+            btnBrand.setOrientation(LinearLayout.VERTICAL);
+            btnBrand.setGravity(android.view.Gravity.CENTER);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMarginEnd(dp(16));
+            btnBrand.setLayoutParams(lp);
+
+            ImageView tvIcon = new ImageView(this);
+            tvIcon.setLayoutParams(new LinearLayout.LayoutParams(dp(48), dp(48)));
+            tvIcon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            tvIcon.setPadding(dp(4), dp(4), dp(4), dp(4));
+            tvIcon.setBackground(getDrawable(android.R.drawable.dialog_holo_light_frame));
+            tvIcon.getBackground().setTint(Color.WHITE);
+
+            TextView tvLabel = new TextView(this);
+            tvLabel.setTextSize(11);
+            tvLabel.setGravity(android.view.Gravity.CENTER);
+            LinearLayout.LayoutParams labelLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            labelLp.topMargin = dp(4);
+            tvLabel.setLayoutParams(labelLp);
+
+            if (brand.equals("ALL")) {
+                tvIcon.setImageResource(android.R.drawable.btn_star_big_on);
+                tvIcon.getBackground().setTint(Color.parseColor("#E91E63"));
+                tvLabel.setText("Tất cả");
+            } else {
+                // Tìm cinema đầu tiên có brand này để lấy logo
+                String logoUrl = null;
+                for (Cinema c : cinemaMap.values()) {
+                    String b = c.getBrand() != null ? c.getBrand() : "";
+                    if (b.equalsIgnoreCase(brand) && c.getLogo() != null) {
+                        logoUrl = c.getLogo();
+                        break;
+                    }
+                }
+                if (logoUrl != null) {
+                    Glide.with(this).load(logoUrl).into(tvIcon);
+                } else {
+                    tvIcon.setImageResource(android.R.drawable.ic_menu_report_image);
+                }
+                tvIcon.getBackground().setTint(Color.WHITE);
+                tvLabel.setText(brand);
+            }
+
+            btnBrand.addView(tvIcon);
+            btnBrand.addView(tvLabel);
+
+            final String selectedBrandKey = brand;
+            btnBrand.setOnClickListener(v -> {
+                selectedBrand = brand.equals("ALL") ? "ALL" : brand;
+                // Highlight nút được chọn
+                for (int i = 0; i < brandContainer.getChildCount(); i++) {
+                    LinearLayout b = (LinearLayout) brandContainer.getChildAt(i);
+                    View icon = b.getChildAt(0);  // ← dùng View thay TextView
+                    icon.getBackground().setTint(Color.WHITE);
+                }
+                tvIcon.getBackground().setTint(Color.parseColor("#E91E63"));
+                renderCinemaList();
+            });
+
+            brandContainer.addView(btnBrand);
+        }
+
+        // Mặc định highlight "Tất cả"
+        if (brandContainer.getChildCount() > 0) {
+            LinearLayout first = (LinearLayout) brandContainer.getChildAt(0);
+            View icon = first.getChildAt(0);
+            icon.getBackground().setTint(Color.parseColor("#E91E63"));
+
+        }
+    }
     private void buildDateButtons() {
-        LinearLayout[] btns = {btnDate17, btnDate18, btnDate19};
-        TextView[] nums     = {tvNum17, tvNum18, tvNum19};
-        TextView[] txts     = {tvTxt17, tvTxt18, tvTxt19};
+        layoutDateContainer.removeAllViews();
 
-        for (LinearLayout b : btns) b.setVisibility(View.GONE);
-
-        // Date trong DB là "26/06/2026"
         SimpleDateFormat inFmt  = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SimpleDateFormat dayFmt = new SimpleDateFormat("dd", Locale.getDefault());
         SimpleDateFormat dowFmt = new SimpleDateFormat("EEE", new Locale("vi", "VN"));
 
-        for (int i = 0; i < Math.min(availableDates.size(), 3); i++) {
+        for (int i = 0; i < availableDates.size(); i++) {
+            LinearLayout btn = new LinearLayout(this);
+            btn.setOrientation(LinearLayout.VERTICAL);
+            btn.setGravity(android.view.Gravity.CENTER);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(65), dp(65));
+            lp.setMarginEnd(dp(8));
+            btn.setLayoutParams(lp);
+            btn.setBackground(getDrawable(android.R.drawable.dialog_holo_light_frame));
+            btn.getBackground().setTint(Color.WHITE);
+
+            TextView tvNum = new TextView(this);
+            TextView tvTxt = new TextView(this);
+
             try {
                 Date d = inFmt.parse(availableDates.get(i));
-                nums[i].setText(dayFmt.format(d));
-                txts[i].setText(dowFmt.format(d));
+                tvNum.setText(dayFmt.format(d));
+                tvTxt.setText(dowFmt.format(d));
             } catch (Exception e) {
-                nums[i].setText(availableDates.get(i).substring(0, 2));
-                txts[i].setText("");
+                tvNum.setText(availableDates.get(i).substring(0, 2));
+                tvTxt.setText("");
             }
-            btns[i].setVisibility(View.VISIBLE);
+
+            tvNum.setTextColor(Color.parseColor("#333333"));
+            tvNum.setTypeface(null, android.graphics.Typeface.BOLD);
+            tvNum.setTextSize(16);
+            tvTxt.setTextColor(Color.parseColor("#888888"));
+            tvTxt.setTextSize(10);
+            tvNum.setGravity(android.view.Gravity.CENTER);
+            tvTxt.setGravity(android.view.Gravity.CENTER);
+            tvNum.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            tvTxt.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+
+            btn.addView(tvNum);
+            btn.addView(tvTxt);
+            btn.setTag(new TextView[]{tvNum, tvTxt});
+
             final int idx = i;
-            btns[i].setOnClickListener(v -> {
+            btn.setOnClickListener(v -> {
                 selectedDate = availableDates.get(idx);
                 highlightDateButton(idx);
                 renderCinemaList();
             });
+
+            layoutDateContainer.addView(btn);
         }
     }
 
@@ -153,12 +264,13 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
 
                 Cinema c = cinemaMap.get(st.getCinemaId());
                 if (c == null) continue;
-                if (!c.getName().toUpperCase().contains(selectedBrand)) continue;
+                String cinemaBrand = c.getBrand() != null ? c.getBrand() : c.getName().split(" ")[0];
+                if (!cinemaBrand.equalsIgnoreCase(selectedBrand)) continue;
             }
             filtered.add(st);
         }
 
-        // Group theo cinemaId (hoặc cinema_name nếu chưa có cinemaId)
+        // Group theo cinemaId
         Map<String, List<Showtime>> grouped = new LinkedHashMap<>();
         for (Showtime st : filtered) {
             String key = st.getCinemaId() != null ? st.getCinemaId() : "unknown";
@@ -179,6 +291,15 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
             Cinema cinema = cinemaMap.get(key);
 
             layoutCinemaList.addView(buildCinemaCard(cinema, entry.getValue()));
+
+
+        }
+
+        // Tự động mở card đầu tiên
+        if (layoutCinemaList.getChildCount() > 0) {
+            LinearLayout firstCard = (LinearLayout) layoutCinemaList.getChildAt(0);
+            View last = firstCard.getChildAt(firstCard.getChildCount() - 1);
+            if (last instanceof LinearLayout) last.setVisibility(View.VISIBLE);
         }
     }
 
@@ -194,22 +315,55 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
         card.setLayoutParams(lp);
 
         // Tên rạp: ưu tiên từ cinemaMap, fallback về cinema_name trong Showtime
+        // Hàng ngang: logo + tên + địa chỉ
+        LinearLayout headerRow = new LinearLayout(this);
+        headerRow.setOrientation(LinearLayout.HORIZONTAL);
+        headerRow.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams headerLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        headerLp.bottomMargin = dp(8);
+        headerRow.setLayoutParams(headerLp);
+
+// Logo rạp
+        ImageView ivLogo = new ImageView(this);
+        LinearLayout.LayoutParams logoLp = new LinearLayout.LayoutParams(dp(40), dp(40));
+        logoLp.setMarginEnd(dp(10));
+        ivLogo.setLayoutParams(logoLp);
+        ivLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if (cinema != null && cinema.getLogo() != null && !cinema.getLogo().isEmpty()) {
+            Glide.with(this).load(cinema.getLogo()).into(ivLogo);
+        } else {
+            ivLogo.setImageResource(android.R.drawable.ic_menu_report_image);
+        }
+
+// Cột tên + địa chỉ
+        LinearLayout infoCol = new LinearLayout(this);
+        infoCol.setOrientation(LinearLayout.VERTICAL);
+
         TextView tvName = new TextView(this);
         tvName.setText(cinema != null ? cinema.getName() : "Rạp chưa xác định");
         tvName.setTextColor(Color.parseColor("#222222"));
         tvName.setTextSize(15);
         tvName.setTypeface(null, android.graphics.Typeface.BOLD);
-        card.addView(tvName);
 
-        // Địa chỉ
+        infoCol.addView(tvName);
+
         if (cinema != null && cinema.getAddress() != null) {
             TextView tvAddr = new TextView(this);
             tvAddr.setText(cinema.getAddress());
             tvAddr.setTextColor(Color.parseColor("#777777"));
             tvAddr.setTextSize(12);
-            tvAddr.setPadding(0, dp(2), 0, dp(10));
-            card.addView(tvAddr);
+            tvAddr.setPadding(0, dp(2), 0, 0);
+            infoCol.addView(tvAddr);
         }
+
+        headerRow.addView(ivLogo);
+        headerRow.addView(infoCol);
+        card.addView(headerRow);
+
+
+
+
 
         // Divider
         View div = new View(this);
@@ -217,6 +371,11 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
         div.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, dp(1)));
         card.addView(div);
+
+// Ẩn phần giờ chiếu mặc định
+        LinearLayout showtimeContent = new LinearLayout(this);
+        showtimeContent.setOrientation(LinearLayout.VERTICAL);
+        showtimeContent.setVisibility(View.GONE); // mặc định ẩn
 
         // Group theo ngôn ngữ
         Map<String, List<Showtime>> byLang = new LinkedHashMap<>();
@@ -231,7 +390,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
             tvLang.setTextColor(Color.parseColor("#111111"));
             tvLang.setTypeface(null, android.graphics.Typeface.BOLD);
             tvLang.setPadding(0, dp(10), 0, dp(8));
-            card.addView(tvLang);
+
 
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
@@ -261,36 +420,47 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
                 });
                 row.addView(tvTime);
             }
-            card.addView(row);
+            showtimeContent.addView(tvLang);
+            showtimeContent.addView(row);
         }
+
+
+        card.addView(showtimeContent);
+
+// Bấm vào card → toggle
+        card.setOnClickListener(v -> {
+            boolean isShowing = showtimeContent.getVisibility() == View.VISIBLE;
+            // Đóng tất cả card khác trước
+            for (int i = 0; i < layoutCinemaList.getChildCount(); i++) {
+                View child = layoutCinemaList.getChildAt(i);
+                if (child instanceof LinearLayout) {
+                    // Tìm showtimeContent bên trong card đó và ẩn đi
+                    LinearLayout childCard = (LinearLayout) child;
+                    if (childCard.getChildCount() > 0) {
+                        View last = childCard.getChildAt(childCard.getChildCount() - 1);
+                        if (last instanceof LinearLayout) last.setVisibility(View.GONE);
+                    }
+                }
+            }
+            // Toggle card hiện tại
+            showtimeContent.setVisibility(isShowing ? View.GONE : View.VISIBLE);
+        });
+
         return card;
     }
 
-    private void highlightDateButton(int active) {
-        LinearLayout[] btns = {btnDate17, btnDate18, btnDate19};
-        TextView[] nums = {tvNum17, tvNum18, tvNum19};
-        TextView[] txts = {tvTxt17, tvTxt18, tvTxt19};
-        for (int i = 0; i < 3; i++) {
-            boolean on = (i == active);
-            btns[i].setBackgroundTintList(android.content.res.ColorStateList.valueOf(
-                    on ? Color.parseColor("#E91E63") : Color.WHITE));
-            nums[i].setTextColor(on ? Color.WHITE : Color.parseColor("#333333"));
-            txts[i].setTextColor(on ? Color.WHITE : Color.parseColor("#888888"));
+    private void highlightDateButton(int activeIdx) {
+        for (int i = 0; i < layoutDateContainer.getChildCount(); i++) {
+            LinearLayout btn = (LinearLayout) layoutDateContainer.getChildAt(i);
+            TextView[] tags = (TextView[]) btn.getTag();
+            boolean on = (i == activeIdx);
+            btn.getBackground().setTint(on ? Color.parseColor("#E91E63") : Color.WHITE);
+            tags[0].setTextColor(on ? Color.WHITE : Color.parseColor("#333333"));
+            tags[1].setTextColor(on ? Color.WHITE : Color.parseColor("#888888"));
         }
     }
 
-    private void highlightBrand(String brand) {
-        imgAll.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.WHITE));
-        imgAll.setTextColor(Color.parseColor("#E91E63"));
-        imgCGV.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.WHITE));
-        imgCGV.setTextColor(Color.parseColor("#E51937"));
-        imgBeta.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.WHITE));
-        imgBeta.setTextColor(Color.parseColor("#00BCD4"));
 
-        TextView t = brand.equals("CGV") ? imgCGV : brand.equals("BETA") ? imgBeta : imgAll;
-        t.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#E91E63")));
-        t.setTextColor(Color.WHITE);
-    }
 
     private int dp(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density);
