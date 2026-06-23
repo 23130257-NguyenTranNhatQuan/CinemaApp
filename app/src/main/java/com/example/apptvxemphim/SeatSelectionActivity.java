@@ -1,5 +1,8 @@
 package com.example.apptvxemphim;
 
+import com.google.firebase.firestore.*;
+import java.util.HashSet;
+import java.util.Set;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -33,66 +36,33 @@ public class SeatSelectionActivity extends AppCompatActivity {
         });
 
         // Khởi tạo dữ liệu map ghế y hệt trong ảnh
-        List<SeatMapView.Seat> list = new ArrayList<>();
+        String showtimeId = getIntent().getStringExtra("SHOWTIME_ID");
+        if (showtimeId == null) { finish(); return; }
 
-        // Hàng A (Chỉ có 12 ghế, từ col 0 đến 11 - loại Thường = 1)
-        for (int i = 0; i < 12; i++) {
-            list.add(new SeatMapView.Seat("A" + (12 - i), 1, false, 0, i));
-        }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Hàng B (Có 10 ghế, loại Thường = 1)
-        for (int i = 0; i < 10; i++) {
-            list.add(new SeatMapView.Seat("B" + (10 - i), 1, false, 1, i));
-        }
+        db.collection("Showtime").document(showtimeId).get()
+                .addOnSuccessListener(stDoc -> {
+                    String hallId = stDoc.getString("hallId");
+                    if (hallId == null) {
+                        // Chưa có hallId thì dùng sơ đồ mặc định 8x10
+                        buildSeatMap(8, 10, new HashSet<>());
+                        return;
+                    }
+                    db.collection("Hall").document(hallId).get()
+                            .addOnSuccessListener(hallDoc -> {
+                                int rows = hallDoc.getLong("rows") != null ? hallDoc.getLong("rows").intValue() : 8;
+                                int cols = hallDoc.getLong("cols") != null ? hallDoc.getLong("cols").intValue() : 10;
 
-        // Hàng C (Có 13 ghế, loại Thường = 1)
-        for (int i = 0; i < 13; i++) {
-            list.add(new SeatMapView.Seat("C" + (13 - i), 1, false, 2, i));
-        }
-
-        // Hàng D (Hỗn hợp VIP đỏ và Đã đặt xám)
-        // Ghế D8, D7, D6, D5 đã đặt (isBooked = true)
-        for (int i = 0; i < 12; i++) {
-            int seatNum = 12 - i;
-            boolean isBooked = (seatNum >= 5 && seatNum <= 8);
-            list.add(new SeatMapView.Seat("D" + seatNum, 2, isBooked, 3, i));
-        }
-
-        // Hàng E (VIP)
-        for (int i = 0; i < 9; i++) {
-            int seatNum = 9 - i;
-            boolean isBooked = (seatNum >= 5 && seatNum <= 7);
-            list.add(new SeatMapView.Seat("E" + seatNum, 2, isBooked, 4, i));
-        }
-
-        // Hàng F (VIP)
-        for (int i = 0; i < 8; i++) {
-            int seatNum = 8 - i;
-            boolean isBooked = (seatNum == 5 || seatNum == 6);
-            list.add(new SeatMapView.Seat("F" + seatNum, 2, isBooked, 5, i));
-        }
-
-        // Hàng G (10 ghế VIP đỏ rực rỡ không ai đặt)
-        for (int i = 0; i < 10; i++) {
-            list.add(new SeatMapView.Seat("G" + (10 - i), 2, false, 6, i));
-        }
-
-        // Hàng H (10 ghế VIP)
-        for (int i = 0; i < 10; i++) {
-            list.add(new SeatMapView.Seat("H" + (10 - i), 2, false, 7, i));
-        }
-
-        // Hàng I (Ghế đôi màu hồng = Loại 3, gồm 4 block đôi)
-        list.add(new SeatMapView.Seat("I8", 3, false, 8, 0));
-        list.add(new SeatMapView.Seat("I7", 3, false, 8, 1));
-        list.add(new SeatMapView.Seat("I6", 3, false, 8, 3)); // tạo khoảng hở lối đi giữa các block ghế đôi bằng cách nhảy cột cách quãng
-        list.add(new SeatMapView.Seat("I5", 3, false, 8, 4));
-        list.add(new SeatMapView.Seat("I4", 3, false, 8, 6));
-        list.add(new SeatMapView.Seat("I3", 3, false, 8, 7));
-        list.add(new SeatMapView.Seat("I2", 3, false, 8, 9));
-        list.add(new SeatMapView.Seat("I1", 3, false, 8, 10));
-
-        seatMapView.setSeats(list);
+                                db.collection("bookedSeats").document(showtimeId).get()
+                                        .addOnSuccessListener(bookedDoc -> {
+                                            Set<String> booked = new HashSet<>();
+                                            if (bookedDoc.exists() && bookedDoc.getData() != null)
+                                                booked.addAll(bookedDoc.getData().keySet());
+                                            buildSeatMap(rows, cols, booked);
+                                        });
+                            });
+                });
 
         // Bắt sự kiện chọn ghế tính tiền
         seatMapView.setOnSeatSelectedListener(new SeatMapView.OnSeatSelectedListener() {
@@ -126,5 +96,18 @@ public class SeatSelectionActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+    }
+
+    private void buildSeatMap(int rows, int cols, Set<String> booked) {
+        String[] labels = {"A","B","C","D","E","F","G","H","I","J"};
+        List<SeatMapView.Seat> list = new ArrayList<>();
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                String name = labels[r] + (c + 1);
+                int type = (r == rows - 1) ? 3 : (r >= rows / 2) ? 2 : 1;
+                list.add(new SeatMapView.Seat(name, type, booked.contains(name), r, c));
+            }
+        }
+        seatMapView.setSeats(list);
     }
 }

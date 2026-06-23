@@ -10,12 +10,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +24,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tvTitle, tvInfo, tvDescription;
     private Button btnWatchTrailer;
 
-    private RecyclerView rcvShowtimes;
-    private ShowtimeDetailAdapter showtimeAdapter;
-    private List<Showtime> showtimeList;
+
 
     private FirebaseFirestore db;
     private String movieId;
@@ -43,7 +40,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvInfo = findViewById(R.id.tv_detail_info);
         tvDescription = findViewById(R.id.tv_detail_description);
         btnWatchTrailer = findViewById(R.id.btn_watch_trailer);
-        rcvShowtimes = findViewById(R.id.rcv_detail_showtimes);
+
 
         db = FirebaseFirestore.getInstance();
 
@@ -56,14 +53,18 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
 
         // 3. Cài đặt RecyclerView cho Suất chiếu
-        showtimeList = new ArrayList<>();
-        showtimeAdapter = new ShowtimeDetailAdapter(showtimeList);
-        rcvShowtimes.setLayoutManager(new LinearLayoutManager(this));
-        rcvShowtimes.setAdapter(showtimeAdapter);
+
 
         // 4. Bắt đầu tải dữ liệu
         loadMovieDetail();
-        loadShowtimes();
+
+        Button btnBuyTicket = findViewById(R.id.btn_buy_ticket);
+        btnBuyTicket.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ShowtimeSelectionActivity.class);
+            intent.putExtra("MOVIE_ID", movieId);
+            startActivity(intent);
+        });
+
     }
 
     private void loadMovieDetail() {
@@ -103,23 +104,10 @@ public class MovieDetailActivity extends AppCompatActivity {
                     }
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Lỗi tải phim", Toast.LENGTH_SHORT).show());
+
+
     }
 
-    private void loadShowtimes() {
-        // Lọc trong bảng Showtime những suất chiếu có mã phim bằng với movieId
-        db.collection("Showtime")
-                .whereEqualTo("movie_id", movieId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        showtimeList.clear();
-                        for (QueryDocumentSnapshot doc : task.getResult()) {
-                            Showtime showtime = doc.toObject(Showtime.class);
-                            showtimeList.add(showtime);
-                        }
-                        showtimeAdapter.notifyDataSetChanged();
-                    }
-                });
-    }
+
 
 }
