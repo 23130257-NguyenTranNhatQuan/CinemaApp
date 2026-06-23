@@ -1,63 +1,33 @@
 package com.example.apptvxemphim;
-
 import com.google.firebase.firestore.DocumentId;
 
 public class Showtime {
-    @DocumentId
-    private String id;
-    private String movie_id;
-    private String cinema_name;
+    @DocumentId private String showtimeId;
+    private String movieId;
+    private String cinemaId;
+    private String hallId;
     private String date;
     private String time;
+    private String language;
     private long price;
 
     public Showtime() {}
 
-    public String getId() {
-        return id;
-    }
+    public String getShowtimeId() { return showtimeId; }
+    public void setShowtimeId(String v) { showtimeId = v; }
+    public String getMovieId() { return movieId; }
+    public void setMovieId(String v) { movieId = v; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getMovie_id() {
-        return movie_id;
-    }
-
-    public void setMovie_id(String movie_id) {
-        this.movie_id = movie_id;
-    }
-
-    public String getCinema_name() {
-        return cinema_name;
-    }
-
-    public void setCinema_name(String cinema_name) {
-        this.cinema_name = cinema_name;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public long getPrice() {
-        return price;
-    }
-
-    public void setPrice(long price) {
-        this.price = price;
-    }
+    public String getCinemaId() { return cinemaId; }
+    public void setCinemaId(String v) { cinemaId = v; }
+    public String getHallId() { return hallId; }
+    public void setHallId(String v) { hallId = v; }
+    public String getDate() { return date; }
+    public void setDate(String v) { date = v; }
+    public String getTime() { return time; }
+    public void setTime(String v) { time = v; }
+    public String getLanguage() { return language; }
+    public void setLanguage(String v) { language = v; }
+    public long getPrice() { return price; }
+    public void setPrice(long v) { price = v; }
 }
