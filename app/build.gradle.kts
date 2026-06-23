@@ -38,6 +38,7 @@ android {
 
 dependencies {
     implementation("com.otaliastudios:zoomlayout:1.9.0")
+    implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
