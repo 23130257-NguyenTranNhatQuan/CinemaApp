@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_cinema_dark"
-    android:orientation="horizontal">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -258,7 +258,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Toy Story 5"
+                android:id="@+id/tvMovieName"
+                android:text=""
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -268,7 +269,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="09:00 ~ 10:42 · Hôm nay, 19/06 · Phòng chiếu P2 · 2D Lồng tiếng"
+            android:id="@+id/tvShowtimeInfo"
+            android:text=""
             android:textColor="#FF7A00"
             android:textSize="13sp" />
 
