@@ -25,6 +25,60 @@ public class SeatSelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_seat_selection);
 
         seatMapView = findViewById(R.id.seatMapView);
+        TextView tvMovieName = findViewById(R.id.tvMovieName);
+        TextView tvShowtimeInfo = findViewById(R.id.tvShowtimeInfo);
+
+        String title       = getIntent().getStringExtra("MOVIE_TITLE");
+        String time        = getIntent().getStringExtra("SHOWTIME_TIME");
+        String date        = getIntent().getStringExtra("SHOWTIME_DATE");
+        String lang        = getIntent().getStringExtra("SHOWTIME_LANG");
+        String hallIdExtra = getIntent().getStringExtra("HALL_ID");
+
+        if (tvMovieName != null)
+            tvMovieName.setText(title != null ? title : "");
+
+// Tính thứ
+        String thuStr = "";
+        try {
+            java.text.SimpleDateFormat inFmt = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
+            java.util.Date d = inFmt.parse(date);
+            java.text.SimpleDateFormat thuFmt = new java.text.SimpleDateFormat("EEEE", new java.util.Locale("vi", "VN"));
+            String raw = thuFmt.format(d);
+            thuStr = raw.substring(0, 1).toUpperCase() + raw.substring(1);
+        } catch (Exception e) { thuStr = ""; }
+
+        String shortDate = date != null && date.length() >= 5 ? date.substring(0, 5) : "";
+        final String thuFinal = thuStr;
+        final String shortDateFinal = shortDate;
+
+        FirebaseFirestore dbInfo = FirebaseFirestore.getInstance();
+        dbInfo.collection("Hall").document(hallIdExtra != null ? hallIdExtra : "").get()
+                .addOnSuccessListener(hallDoc -> {
+                    String hallName = hallDoc.getString("name") != null ? hallDoc.getString("name") : "Phòng chiếu";
+                    dbInfo.collection("Movie").whereEqualTo("title", title).limit(1).get()
+                            .addOnSuccessListener(movieSnap -> {
+                                String endTime = "";
+                                if (!movieSnap.isEmpty()) {
+                                    Long duration = movieSnap.getDocuments().get(0).getLong("duration");
+                                    if (duration != null && time != null) {
+                                        try {
+                                            String[] parts = time.split(":");
+                                            int totalMin = Integer.parseInt(parts[0]) * 60 + Integer.parseInt(parts[1]) + duration.intValue();
+                                            endTime = String.format("%02d:%02d", totalMin / 60 % 24, totalMin % 60);
+                                        } catch (Exception ignored) {}
+                                    }
+                                }
+                                String format = movieSnap.isEmpty() ? "2D" :
+                                        (movieSnap.getDocuments().get(0).getString("format") != null ?
+                                                movieSnap.getDocuments().get(0).getString("format") : "2D");
+
+                                String info = time + " ~ " + endTime
+                                        + " · " + thuFinal + ", " + shortDateFinal
+                                        + " · " + hallName
+                                        + " · " + format + " " + lang;
+                                if (tvShowtimeInfo != null) tvShowtimeInfo.setText(info);
+                            });
+                });
         tvSelectedSeatNames = findViewById(R.id.tvSelectedSeatNames);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         btnClearSeats = findViewById(R.id.btnClearSeats);
@@ -43,13 +97,13 @@ public class SeatSelectionActivity extends AppCompatActivity {
 
         db.collection("Showtime").document(showtimeId).get()
                 .addOnSuccessListener(stDoc -> {
-                    String hallId = stDoc.getString("hallId");
-                    if (hallId == null) {
+                    String hallIdFromDoc = stDoc.getString("hallId");
+                    if (hallIdFromDoc  == null) {
                         // Chưa có hallId thì dùng sơ đồ mặc định 8x10
                         buildSeatMap(8, 10, new HashSet<>());
                         return;
                     }
-                    db.collection("Hall").document(hallId).get()
+                    db.collection("Hall").document(hallIdFromDoc).get()
                             .addOnSuccessListener(hallDoc -> {
                                 int rows = hallDoc.getLong("rows") != null ? hallDoc.getLong("rows").intValue() : 8;
                                 int cols = hallDoc.getLong("cols") != null ? hallDoc.getLong("cols").intValue() : 10;

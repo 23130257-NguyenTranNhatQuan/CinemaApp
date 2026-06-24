@@ -27,6 +27,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
     private List<String> availableDates = new ArrayList<>();
     private String selectedDate = "";
     private String selectedBrand = "ALL";
+    private long movieDuration = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,8 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
                     if (doc.exists()) {
                         String title = doc.getString("title");
                         tvMovieTitle.setText("Lịch chiếu " + (title != null ? title : ""));
+                        Long dur = doc.getLong("duration");
+                        if (dur != null) movieDuration = dur;
                     }
                 });
     }
@@ -401,7 +404,18 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
 
             for (Showtime st : le.getValue()) {
                 TextView tvTime = new TextView(this);
-                tvTime.setText(st.getTime());
+                String startTime = st.getTime();
+                String endTime = "";
+                if (movieDuration > 0 && startTime != null) {
+                    try {
+                        String[] parts = startTime.split(":");
+                        int totalMin = Integer.parseInt(parts[0]) * 60
+                                + Integer.parseInt(parts[1])
+                                + (int) movieDuration;
+                        endTime = String.format("%02d:%02d", totalMin / 60 % 24, totalMin % 60);
+                    } catch (Exception ignored) {}
+                }
+                tvTime.setText(startTime + (endTime.isEmpty() ? "" : " ~ " + endTime));
                 tvTime.setBackground(getDrawable(android.R.drawable.dialog_holo_light_frame));
                 tvTime.getBackground().setTint(Color.parseColor("#EBF5FF"));
                 tvTime.setTextColor(Color.parseColor("#007AFF"));
@@ -413,9 +427,21 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
                 tvTime.setLayoutParams(btnLp);
 
                 final String stId = st.getShowtimeId();
+                final String stTime = st.getTime();
+                final String stDate = st.getDate();
+                final String stLang = st.getLanguage();
+                final String cinemaName = cinema != null ? cinema.getName() : "";
+                final String stHallId = st.getHallId();
+
                 tvTime.setOnClickListener(v -> {
                     Intent intent = new Intent(this, SeatSelectionActivity.class);
                     intent.putExtra("SHOWTIME_ID", stId);
+                    intent.putExtra("MOVIE_TITLE", ((TextView)findViewById(R.id.tvMovieTitle)).getText().toString().replace("Lịch chiếu ", ""));
+                    intent.putExtra("SHOWTIME_TIME", stTime);
+                    intent.putExtra("SHOWTIME_DATE", stDate);
+                    intent.putExtra("SHOWTIME_LANG", stLang);
+                    intent.putExtra("HALL_ID", stHallId);
+                    intent.putExtra("MOVIE_ID_FOR_FORMAT", movieId);
                     startActivity(intent);
                 });
                 row.addView(tvTime);
