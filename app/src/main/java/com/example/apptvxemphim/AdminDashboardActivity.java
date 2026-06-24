@@ -28,9 +28,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         // 2. Bắt sự kiện Click cho từng khối chức năng
         cardMovies.setOnClickListener(v -> {
-            // Khi Dev UI làm xong trang Quản lý phim, bạn mở comment 2 dòng dưới ra
-            // Intent intent = new Intent(AdminDashboardActivity.this, ManageMoviesActivity.class);
-            // startActivity(intent);
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageMoviesActivity.class);
+            startActivity(intent);
             Toast.makeText(this, "Đang mở Quản lý Phim...", Toast.LENGTH_SHORT).show();
         });
 

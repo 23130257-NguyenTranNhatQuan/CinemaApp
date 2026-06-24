@@ -38,7 +38,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         // Dòng 2: Thể loại (genres array -> join thành chuỗi)
         if (movie.getGenres() != null && !movie.getGenres().isEmpty()) {
-            String genresStr = String.join(", ", movie.getGenres());
+            String genresStr = android.text.TextUtils.join(", ", movie.getGenres());
             holder.tvGenre.setText(genresStr);
         } else {
             holder.tvGenre.setText("Đang cập nhật");
