@@ -184,15 +184,15 @@ public class MainActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 comingSoonList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    Movie movie = document.toObject(Movie.class);
-                    comingSoonList.add(movie);
+                    try { // THÊM TRY-CATCH VÀO ĐÂY
+                        Movie movie = document.toObject(Movie.class);
+                        comingSoonList.add(movie);
+                    } catch (Exception e) {
+                        // In ra tên file phim bị lỗi để bạn biết đường lên Firebase sửa
+                        Log.e("Loi_Firebase", "Phim sắp chiếu bị lỗi kiểu dữ liệu ở ID: " + document.getId() + " - " + e.getMessage());
+                    }
                 }
                 comingSoonAdapter.notifyDataSetChanged();
-                Log.d("FirebaseTest", "Loaded " + comingSoonList.size() + " coming soon movies");
-            } else {
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu phim sắp chiếu", task.getException());
-                // Load placeholder data if Firebase fails
-                loadPlaceholderComingSoon();
             }
         });
 
@@ -201,12 +201,14 @@ public class MainActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 movieList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    Movie movie = document.toObject(Movie.class);
-                    movieList.add(movie);
+                    try { // THÊM TRY-CATCH VÀO ĐÂY
+                        Movie movie = document.toObject(Movie.class);
+                        movieList.add(movie);
+                    } catch (Exception e) {
+                        Log.e("Loi_Firebase", "Phim đang chiếu bị lỗi kiểu dữ liệu ở ID: " + document.getId() + " - " + e.getMessage());
+                    }
                 }
                 movieAdapter.notifyDataSetChanged();
-            } else {
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu phim đang chiếu", task.getException());
             }
         });
 

@@ -14,6 +14,8 @@ public class Movie {
     private String title;
     private long duration;
     private String description;
+    private String director;
+    private String cast;
     private String poster;
     private String trailer;
     private List<String> genres;
@@ -101,6 +103,22 @@ public class Movie {
 
     public void setReleaseDate(Timestamp releaseDate) {
         this.releaseDate = releaseDate;
+    }
+
+    public String getDirector() {
+        return director;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
+    public String getCast() {
+        return cast;
+    }
+
+    public void setCast(String cast) {
+        this.cast = cast;
     }
 
     // Helper method to get formatted release date string
