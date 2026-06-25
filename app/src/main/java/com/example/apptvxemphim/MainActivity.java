@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.apptvxemphim.News;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -99,9 +100,9 @@ public class MainActivity extends AppCompatActivity {
         // Verify ImageViews were found
         for (int i = 0; i < bannerImages.length; i++) {
             if (bannerImages[i] == null) {
-                Log.e("FirebaseTest", "banner" + (i+1) + " ImageView is NULL!");
+                Log.e("FirebaseTest", "banner" + (i + 1) + " ImageView is NULL!");
             } else {
-                Log.d("FirebaseTest", "banner" + (i+1) + " ImageView found: " + bannerImages[i]);
+                Log.d("FirebaseTest", "banner" + (i + 1) + " ImageView found: " + bannerImages[i]);
             }
         }
 
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         // Verify dots were found
         for (int i = 0; i < dots.length; i++) {
             if (dots[i] == null) {
-                Log.e("FirebaseTest", "dot" + (i+1) + " ImageView is NULL!");
+                Log.e("FirebaseTest", "dot" + (i + 1) + " ImageView is NULL!");
             }
         }
 
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         rcvNews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         newsList = new ArrayList<>();
-        newsAdapter = new NewsAdapter(newsList);
+        newsAdapter = new NewsAdapter(newsList, MainActivity.this);
         rcvNews.setAdapter(newsAdapter);
 
         // Load data from Firebase
@@ -212,24 +213,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Load news from "News" collection
         db.collection("News").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+            if (task.isSuccessful() && task.getResult() != null) {
                 newsList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     News news = document.toObject(News.class);
                     newsList.add(news);
                 }
                 newsAdapter.notifyDataSetChanged();
-                Log.d("FirebaseTest", "Loaded " + newsList.size() + " news items");
             } else {
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu tin tức", task.getException());
-                // Load placeholder news if Firebase fails
-                loadPlaceholderNews();
+                Log.e("Loi_Firebase", "Lỗi tải tin tức: " + (task.getException() != null ? task.getException().getMessage() : "Unknown"));
             }
         });
     }
-
     private void loadPlaceholderComingSoon() {
         comingSoonList.clear();
         String[] placeholderPosters = {
@@ -251,28 +247,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadPlaceholderNews() {
         newsList.clear();
-        String[] placeholderImages = {
-                "https://via.placeholder.com/400x200/FF9800/FFFFFF?text=Uu+ Dai+1",
-                "https://via.placeholder.com/400x200/E91E63/FFFFFF?text=Uu+ Dai+2",
-                "https://via.placeholder.com/400x200/4CAF50/FFFFFF?text=Uu+ Dai+3",
-                "https://via.placeholder.com/400x200/9C27B0/FFFFFF?text=Uu+ Dai+4"
-        };
-        String[] names = {
-                "Ưu đãi đặc biệt cuối tuần - Giảm 30% vé xem phim",
-                "Mua 1 tặng 1 cho khách hàng thân thiết",
-                "Combo bỏng nước chỉ 49.000đ khi mua vé online",
-                "Sự kiện ra mắt phim mới - Nhận quà tặng hấp dẫn"
-        };
+        // Tạo dữ liệu mẫu kiểu News
+        newsList.add(new News("Ưu đãi đặc biệt", "url_anh_1", "Nội dung ưu đãi 1"));
+        newsList.add(new News("Mua 1 tặng 1", "url_anh_2", "Nội dung ưu đãi 2"));
 
-        for (int i = 0; i < placeholderImages.length; i++) {
-            News news = new News();
-            news.setName(names[i]);
-            news.setPoster(placeholderImages[i]);
-            newsList.add(news);
+        if (newsAdapter != null) {
+            newsAdapter.notifyDataSetChanged();
         }
-        newsAdapter.notifyDataSetChanged();
     }
-
     private void loadBannersFromFirebase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Log.d("FirebaseTest", "Starting to load banners from Firebase...");
