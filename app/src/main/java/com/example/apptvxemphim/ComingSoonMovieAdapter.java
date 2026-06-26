@@ -1,5 +1,6 @@
 package com.example.apptvxemphim;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +48,13 @@ public class ComingSoonMovieAdapter extends RecyclerView.Adapter<ComingSoonMovie
                 .placeholder(android.R.drawable.ic_menu_report_image)
                 .error(android.R.drawable.ic_menu_report_image)
                 .into(holder.imgPoster);
+
+        // Click to open detail page
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), ComingSoonDetailActivity.class);
+            intent.putExtra("MOVIE_ID", movie.getId());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override

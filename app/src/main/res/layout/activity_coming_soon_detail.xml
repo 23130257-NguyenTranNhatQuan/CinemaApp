@@ -125,11 +125,38 @@
                     android:textColor="#D4C4EB"
                     android:textSize="13sp" />
 
+                <!-- Release Date -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12dp"
+                    android:background="@color/purple_dark"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📅"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tv_release_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Khởi chiếu: 01/01/2024"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
                 <!-- Description -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="16dp"
                     android:text="Mô tả phim"
                     android:textColor="@color/white"
                     android:textSize="16sp"
@@ -145,18 +172,10 @@
                     android:lineSpacingExtra="4dp"
                     android:textSize="14sp" />
 
-                <!-- Buy Ticket Button -->
-                <Button
-                    android:id="@+id/btn_buy_ticket"
+                <!-- Bottom spacing -->
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="16dp"
-                    android:backgroundTint="@color/primary_pink"
-                    android:text="🎬 Mua vé"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:layout_height="16dp" />
 
             </LinearLayout>
         </FrameLayout>
