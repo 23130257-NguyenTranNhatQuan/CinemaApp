@@ -13,6 +13,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 import android.view.View;
+import android.widget.Button;
+import android.content.Intent;
 
 public class SeatSelectionActivity extends AppCompatActivity {
 
@@ -113,13 +115,13 @@ public class SeatSelectionActivity extends AppCompatActivity {
                     return;
                 }
 
-                StringBuilder names = new StringBuilder("Chỗ ngồi: ");
-                long totalPrice = 0;
+                    StringBuilder names = new StringBuilder("Chỗ ngồi: ");
+                    long totalPrice = 0;
 
-                for (int i = 0; i < selectedSeats.size(); i++) {
-                    SeatMapView.Seat seat = selectedSeats.get(i);
-                    names.append(seat.name);
-                    if (i < selectedSeats.size() - 1) names.append(", ");
+                    for (int i = 0; i < selectedSeats.size(); i++) {
+                        SeatMapView.Seat seat = selectedSeats.get(i);
+                        names.append(seat.name);
+                        if (i < selectedSeats.size() - 1) names.append(", ");
 
                     // Giá vé hardcode theo loại ghế (không lấy từ DB)
                     if (seat.type == 1) totalPrice += 80000;      // Thường
@@ -163,8 +165,12 @@ public class SeatSelectionActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-    }
+                ArrayList<String> seatNames = new ArrayList<>();
+                for (SeatMapView.Seat s : selected) seatNames.add(s.name);
+                intent.putStringArrayListExtra("SELECTED_SEATS", seatNames);
+
+                startActivity(intent);
+            });
 
     private void loadHallAndRender(FirebaseFirestore db, String hallId, String showtimeId) {
         db.collection("Hall").document(hallId).get()

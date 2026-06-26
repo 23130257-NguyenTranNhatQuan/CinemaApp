@@ -6,6 +6,7 @@
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -55,7 +56,12 @@
         <activity android:name=".AdminDashboardActivity" android:exported="false" />
         <activity android:name=".ManageMoviesActivity" android:exported="false" />
         <activity android:name=".AddEditMovieActivity" android:exported="false" />
+        <activity android:name=".ManageCinemasActivity" android:exported="false" />
+        <activity android:name=".ManageUsersActivity" android:exported="false" />
 
+        <activity android:name=".PaymentActivity" />
+        <activity android:name=".PaymentResultActivity" />
+        <activity android:name=".NewsDetailActivity" />
     </application>
 
 </manifest>
