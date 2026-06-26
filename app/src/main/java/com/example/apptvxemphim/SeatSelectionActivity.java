@@ -1,13 +1,14 @@
 package com.example.apptvxemphim;
 
 import com.google.firebase.firestore.*;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import java.util.ArrayList;
 import java.util.List;
 import android.view.View;
 
@@ -15,13 +16,12 @@ public class SeatSelectionActivity extends AppCompatActivity {
 
     private SeatMapView seatMapView;
     private TextView tvSelectedSeatNames, tvTotalPrice;
-
     private ImageButton btnClearSeats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTheme(androidx.appcompat.R.style.Theme_AppCompat_NoActionBar); // Ẩn Actionbar mặc định
+        setTheme(androidx.appcompat.R.style.Theme_AppCompat_NoActionBar);
         setContentView(R.layout.activity_seat_selection);
 
         seatMapView = findViewById(R.id.seatMapView);
@@ -34,10 +34,8 @@ public class SeatSelectionActivity extends AppCompatActivity {
         String lang        = getIntent().getStringExtra("SHOWTIME_LANG");
         String hallIdExtra = getIntent().getStringExtra("HALL_ID");
 
-        if (tvMovieName != null)
-            tvMovieName.setText(title != null ? title : "");
+        if (tvMovieName != null) tvMovieName.setText(title != null ? title : "");
 
-// Tính thứ
         String thuStr = "";
         try {
             java.text.SimpleDateFormat inFmt = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
@@ -79,6 +77,7 @@ public class SeatSelectionActivity extends AppCompatActivity {
                                 if (tvShowtimeInfo != null) tvShowtimeInfo.setText(info);
                             });
                 });
+
         tvSelectedSeatNames = findViewById(R.id.tvSelectedSeatNames);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         btnClearSeats = findViewById(R.id.btnClearSeats);
@@ -89,7 +88,6 @@ public class SeatSelectionActivity extends AppCompatActivity {
             btnClearSeats.setVisibility(View.GONE);
         });
 
-        // Khởi tạo dữ liệu map ghế y hệt trong ảnh
         String showtimeId = getIntent().getStringExtra("SHOWTIME_ID");
         if (showtimeId == null) { finish(); return; }
 
@@ -98,27 +96,11 @@ public class SeatSelectionActivity extends AppCompatActivity {
         db.collection("Showtime").document(showtimeId).get()
                 .addOnSuccessListener(stDoc -> {
                     String hallIdFromDoc = stDoc.getString("hallId");
-                    if (hallIdFromDoc  == null) {
-                        // Chưa có hallId thì dùng sơ đồ mặc định 8x10
-                        buildSeatMap(8, 10, new HashSet<>());
-                        return;
-                    }
-                    db.collection("Hall").document(hallIdFromDoc).get()
-                            .addOnSuccessListener(hallDoc -> {
-                                int rows = hallDoc.getLong("rows") != null ? hallDoc.getLong("rows").intValue() : 8;
-                                int cols = hallDoc.getLong("cols") != null ? hallDoc.getLong("cols").intValue() : 10;
-
-                                db.collection("bookedSeats").document(showtimeId).get()
-                                        .addOnSuccessListener(bookedDoc -> {
-                                            Set<String> booked = new HashSet<>();
-                                            if (bookedDoc.exists() && bookedDoc.getData() != null)
-                                                booked.addAll(bookedDoc.getData().keySet());
-                                            buildSeatMap(rows, cols, booked);
-                                        });
-                            });
+                    String hallId = hallIdFromDoc != null ? hallIdFromDoc : hallIdExtra;
+                    if (hallId == null) { finish(); return; }
+                    loadHallAndRender(db, hallId, showtimeId);
                 });
 
-        // Bắt sự kiện chọn ghế tính tiền
         seatMapView.setOnSeatSelectedListener(new SeatMapView.OnSeatSelectedListener() {
             @Override
             public void onSeatSelectionChanged(List<SeatMapView.Seat> selectedSeats) {
@@ -137,7 +119,7 @@ public class SeatSelectionActivity extends AppCompatActivity {
                     names.append(seat.name);
                     if (i < selectedSeats.size() - 1) names.append(", ");
 
-                    // Tính tiền tạm tính theo loại ghế ví dụ
+                    // Giá vé hardcode theo loại ghế (không lấy từ DB)
                     if (seat.type == 1) totalPrice += 80000;      // Thường
                     else if (seat.type == 2) totalPrice += 110000; // VIP
                     else if (seat.type == 3) totalPrice += 220000; // Đôi
@@ -152,16 +134,51 @@ public class SeatSelectionActivity extends AppCompatActivity {
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
-    private void buildSeatMap(int rows, int cols, Set<String> booked) {
-        String[] labels = {"A","B","C","D","E","F","G","H","I","J"};
-        List<SeatMapView.Seat> list = new ArrayList<>();
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                String name = labels[r] + (c + 1);
-                int type = (r == rows - 1) ? 3 : (r >= rows / 2) ? 2 : 1;
-                list.add(new SeatMapView.Seat(name, type, booked.contains(name), r, c));
-            }
-        }
-        seatMapView.setSeats(list);
+    private void loadHallAndRender(FirebaseFirestore db, String hallId, String showtimeId) {
+        db.collection("Hall").document(hallId).get()
+                .addOnSuccessListener(hallDoc -> {
+                    if (!hallDoc.exists()) { finish(); return; }
+
+                    Hall hall = new Hall();
+                    hall.hallId = hallId;
+                    hall.cinemaId = hallDoc.getString("cinemaId");
+                    hall.name = hallDoc.getString("name");
+                    hall.rows = hallDoc.getLong("rows") != null ? hallDoc.getLong("rows").intValue() : 8;
+                    hall.cols = hallDoc.getLong("cols") != null ? hallDoc.getLong("cols").intValue() : 10;
+                    hall.vipRows = hallDoc.getLong("vipRows") != null ? hallDoc.getLong("vipRows").intValue() : 0;
+                    hall.coupleRows = hallDoc.getLong("coupleRows") != null ? hallDoc.getLong("coupleRows").intValue() : 0;
+
+                    Map<String, Object> cz = (Map<String, Object>) hallDoc.get("centerZone");
+                    if (cz != null) {
+                        hall.centerStartRow = ((Long) cz.get("startRow")).intValue();
+                        hall.centerEndRow = ((Long) cz.get("endRow")).intValue();
+                        hall.centerStartCol = ((Long) cz.get("startCol")).intValue();
+                        hall.centerEndCol = ((Long) cz.get("endCol")).intValue();
+                    }
+
+                    // Lấy override (ngoại lệ từng ghế) của phòng này
+                    db.collection("HallOverrides").document(hallId).get()
+                            .addOnSuccessListener(layoutDoc -> {
+                                Map<String, Integer> overrides = new HashMap<>();
+                                if (layoutDoc.exists() && layoutDoc.getData() != null) {
+                                    for (Map.Entry<String, Object> e : layoutDoc.getData().entrySet()) {
+                                        if (e.getValue() instanceof Long) {
+                                            overrides.put(e.getKey(), ((Long) e.getValue()).intValue());
+                                        }
+                                    }
+                                }
+
+                                // Lấy ghế đã đặt theo showtime này
+                                db.collection("bookedSeats").document(showtimeId).get()
+                                        .addOnSuccessListener(bookedDoc -> {
+                                            Set<String> booked = new HashSet<>();
+                                            if (bookedDoc.exists() && bookedDoc.getData() != null) {
+                                                booked.addAll(bookedDoc.getData().keySet());
+                                            }
+                                            seatMapView.setEditMode(false);
+                                            seatMapView.generate(hall, overrides, booked);
+                                        });
+                            });
+                });
     }
 }
