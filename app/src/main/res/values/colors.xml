@@ -11,7 +11,7 @@
     <color name="seat_normal">#722ED1</color>  <color name="seat_vip">#F5222D</color>     <color name="seat_double">#EB2F96</color>  <color name="seat_booked">#434343</color>  <color name="seat_selected">#FF00A0</color><color name="text_white">#FFFFFF</color>
     <color name="text_gray">#A6A6A6</color>
 
-    <color name="center_zone_border">#2F6946</color>
+    <color name="center_zone_border">#4CAF50</color>
     <color name="purple_light">#7B4B94</color>
     <color name="purple_dark">#2D1B4E</color>
     <color name="yellow">#FFD700</color>
