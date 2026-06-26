@@ -72,6 +72,7 @@ public class SeatMapView extends View {
     private final float rowGap = 2;
     private final float paddingLeftRight = 2;
     private final float paddingTop = 2;
+    private float offsetX = paddingLeftRight;
 
     public SeatMapView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -194,6 +195,8 @@ public class SeatMapView extends View {
             float totalHeight = (paddingTop * 2) + (effectiveRows * seatSize) + ((effectiveRows - 1) * rowGap);
             setMeasuredDimension(width, (int) totalHeight);
         }
+        float totalGridWidth = effectiveCols * seatSize + (effectiveCols - 1) * seatGap;
+        offsetX = (MeasureSpec.getSize(widthMeasureSpec) - totalGridWidth) / 2f;
     }
 
     // ===== Vẽ =====
@@ -211,10 +214,10 @@ public class SeatMapView extends View {
             // Ghế đôi: chỉ vẽ 1 lần ở ô có col chẵn-nhỏ-hơn trong cặp để khỏi vẽ đè
             if (seat.type == 3 && isSecondOfCouple(seat)) continue;
 
-            float left = paddingLeftRight + seat.col * (seatSize + seatGap);
+            float left = offsetX + seat.col * (seatSize + seatGap);
             float top = paddingTop + seat.row * (seatSize + rowGap);
             float right = seat.type == 3
-                    ? paddingLeftRight + (seat.col + 2) * (seatSize + seatGap) - seatGap
+                    ? offsetX + (seat.col + 2) * (seatSize + seatGap) - seatGap
                     : left + seatSize;
             float bottom = top + seatSize;
 
@@ -269,9 +272,9 @@ public class SeatMapView extends View {
     }
 
     private void drawZoneRect(Canvas canvas, int startRow, int endRow, int startCol, int endCol, Paint paint, boolean fill) {
-        float left = paddingLeftRight + startCol * (seatSize + seatGap) - seatGap / 2f;
+        float left = offsetX + startCol * (seatSize + seatGap) - seatGap / 2f;
         float top = paddingTop + startRow * (seatSize + rowGap) - rowGap / 2f;
-        float right = paddingLeftRight + (endCol + 1) * (seatSize + seatGap) - seatGap / 2f;
+        float right = offsetX + (endCol + 1) * (seatSize + seatGap) - seatGap / 2f;
         float bottom = paddingTop + (endRow + 1) * (seatSize + rowGap) - rowGap / 2f;
         RectF rect = new RectF(left, top, right, bottom);
         canvas.drawRoundRect(rect, 2, 2, paint);
@@ -334,7 +337,7 @@ public class SeatMapView extends View {
     /** Trả về [row, col] ước lượng từ toạ độ chạm (kể cả ngoài ô ghế, để kéo vùng mượt) */
     private int[] coordToRowCol(float x, float y) {
         if (seatSize <= 0) return null;
-        int col = (int) ((x - paddingLeftRight) / (seatSize + seatGap));
+        int col = (int) ((x - offsetX) / (seatSize + seatGap));
         int row = (int) ((y - paddingTop) / (seatSize + rowGap));
         if (row < 0) row = 0;
         if (col < 0) col = 0;
@@ -348,13 +351,13 @@ public class SeatMapView extends View {
             if (!editMode && seat.isBooked) continue;
             if (seat.type == 3 && isSecondOfCouple(seat)) continue;
 
-            float left = paddingLeftRight + seat.col * (seatSize + seatGap);
+            float left = offsetX + seat.col * (seatSize + seatGap);
             float top = paddingTop + seat.row * (seatSize + rowGap);
             // Ghế đôi: right chỉ kéo đến hết col kế tiếp THỰC SỰ
             float right;
             if (seat.type == 3) {
                 // Tìm partner để tính right chính xác
-                right = paddingLeftRight + (seat.col + 2) * (seatSize + seatGap) - seatGap;
+                right = offsetX + (seat.col + 2) * (seatSize + seatGap) - seatGap;
             } else {
                 right = left + seatSize;
             }
