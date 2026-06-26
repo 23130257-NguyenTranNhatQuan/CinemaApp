@@ -34,6 +34,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
 
         cardCinemas.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageCinemasActivity.class);
+            startActivity(intent);
             Toast.makeText(this, "Đang mở Quản lý Rạp...", Toast.LENGTH_SHORT).show();
         });
 
@@ -42,6 +44,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
 
         cardUsers.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageUsersActivity.class);
+            startActivity(intent);
             Toast.makeText(this, "Đang mở Quản lý Người dùng...", Toast.LENGTH_SHORT).show();
         });
 
