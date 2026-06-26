@@ -165,13 +165,8 @@ public class SeatSelectionActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-                ArrayList<String> seatNames = new ArrayList<>();
-                for (SeatMapView.Seat s : selected) seatNames.add(s.name);
-                intent.putStringArrayListExtra("SELECTED_SEATS", seatNames);
-
-                startActivity(intent);
-            });
-
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+    }
     private void loadHallAndRender(FirebaseFirestore db, String hallId, String showtimeId) {
         db.collection("Hall").document(hallId).get()
                 .addOnSuccessListener(hallDoc -> {
@@ -207,7 +202,7 @@ public class SeatSelectionActivity extends AppCompatActivity {
                                 }
 
                                 // Lấy ghế đã đặt theo showtime này
-                                db.collection("bookedSeats").document(showtimeId).get()
+                                db.collection("BookedSeats").document(showtimeId).get()
                                         .addOnSuccessListener(bookedDoc -> {
                                             Set<String> booked = new HashSet<>();
                                             if (bookedDoc.exists() && bookedDoc.getData() != null) {
