@@ -1,6 +1,8 @@
 package com.example.apptvxemphim;
 
 import com.google.firebase.firestore.*;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -129,6 +131,36 @@ public class SeatSelectionActivity extends AppCompatActivity {
                 tvTotalPrice.setText(String.format("%,dđ", totalPrice));
                 btnClearSeats.setVisibility(View.VISIBLE);
             }
+        });
+        findViewById(R.id.btnBuyTicket).setOnClickListener(v -> {
+            List<SeatMapView.Seat> selected = new ArrayList<>();
+            for (SeatMapView.Seat s : seatMapView.getSeatList()) {
+                if (s.isSelected) selected.add(s);
+            }
+            if (selected.isEmpty()) return;
+
+            long seatTotal = 0;
+            StringBuilder seatNames = new StringBuilder();
+            for (int i = 0; i < selected.size(); i++) {
+                SeatMapView.Seat s = selected.get(i);
+                if (i > 0) seatNames.append(", ");
+                seatNames.append(s.name);
+                if (s.type == 1) seatTotal += 80000;
+                else if (s.type == 2) seatTotal += 110000;
+                else if (s.type == 3) seatTotal += 220000;
+            }
+
+            android.content.Intent intent = new android.content.Intent(this, ComboSelectionActivity.class);
+            intent.putExtra("MOVIE_TITLE",   getIntent().getStringExtra("MOVIE_TITLE"));
+            intent.putExtra("SHOWTIME_ID",   getIntent().getStringExtra("SHOWTIME_ID"));
+            intent.putExtra("SHOWTIME_TIME", getIntent().getStringExtra("SHOWTIME_TIME"));
+            intent.putExtra("SHOWTIME_DATE", getIntent().getStringExtra("SHOWTIME_DATE"));
+            intent.putExtra("SHOWTIME_LANG", getIntent().getStringExtra("SHOWTIME_LANG"));
+            intent.putExtra("HALL_ID",       getIntent().getStringExtra("HALL_ID"));
+            intent.putExtra("SEAT_NAMES",    seatNames.toString());
+            intent.putExtra("SEAT_TOTAL",    seatTotal);
+            intent.putExtra("SEAT_COUNT",    selected.size());
+            startActivity(intent);
         });
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
