@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.apptvxemphim.News;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -90,6 +91,15 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.banner4)
         };
 
+        // Verify ImageViews were found
+        for (int i = 0; i < bannerImages.length; i++) {
+            if (bannerImages[i] == null) {
+                Log.e("FirebaseTest", "banner" + (i + 1) + " ImageView is NULL!");
+            } else {
+                Log.d("FirebaseTest", "banner" + (i + 1) + " ImageView found: " + bannerImages[i]);
+            }
+        }
+
         btnPrev = findViewById(R.id.btn_prev);
         btnNext = findViewById(R.id.btn_next);
 
@@ -100,6 +110,14 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.dot4)
         };
 
+        // Verify dots were found
+        for (int i = 0; i < dots.length; i++) {
+            if (dots[i] == null) {
+                Log.e("FirebaseTest", "dot" + (i + 1) + " ImageView is NULL!");
+            }
+        }
+
+        // Load placeholder banners immediately so user sees something
         loadPlaceholderBanners();
         loadBannersFromFirebase();
 
@@ -171,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         rcvNews = findViewById(R.id.rcv_news);
         rcvNews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         newsList = new ArrayList<>();
-        newsAdapter = new NewsAdapter(newsList);
+        newsAdapter = new NewsAdapter(newsList, MainActivity.this);
         rcvNews.setAdapter(newsAdapter);
 
         // Load data from Firebase
@@ -210,23 +228,49 @@ public class MainActivity extends AppCompatActivity {
         });
 
         db.collection("News").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+            if (task.isSuccessful() && task.getResult() != null) {
                 newsList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     News news = document.toObject(News.class);
                     newsList.add(news);
                 }
                 newsAdapter.notifyDataSetChanged();
-                Log.d("FirebaseTest", "Loaded " + newsList.size() + " news items");
             } else {
+                Log.e("Loi_Firebase", "Lỗi tải tin tức: " + (task.getException() != null ? task.getException().getMessage() : "Unknown"));
                 Log.w("FirebaseTest", "Lỗi lấy dữ liệu tin tức", task.getException());
                 loadPlaceholderNews();
             }
         });
     }
+    private void loadPlaceholderComingSoon() {
+        comingSoonList.clear();
+        String[] placeholderPosters = {
+                "https://via.placeholder.com/300x400/3F51B5/FFFFFF?text=Phim+Sap+Chieu+1",
+                "https://via.placeholder.com/300x400/009688/FFFFFF?text=Phim+Sap+Chieu+2",
+                "https://via.placeholder.com/300x400/FF5722/FFFFFF?text=Phim+Sap+Chieu+3",
+                "https://via.placeholder.com/300x400/607D8B/FFFFFF?text=Phim+Sap+Chieu+4"
+        };
+        String[] titles = {"Phim Sắp Chiếu 1", "Phim Sắp Chiếu 2", "Phim Sắp Chiếu 3", "Phim Sắp Chiếu 4"};
+
+        for (int i = 0; i < placeholderPosters.length; i++) {
+            Movie movie = new Movie();
+            movie.setTitle(titles[i]);
+            movie.setPoster(placeholderPosters[i]);
+            comingSoonList.add(movie);
+        }
+        comingSoonAdapter.notifyDataSetChanged();
+    }
+
 
     private void loadPlaceholderNews() {
         newsList.clear();
+        // Tạo dữ liệu mẫu kiểu News
+        newsList.add(new News("Ưu đãi đặc biệt", "url_anh_1", "Nội dung ưu đãi 1"));
+        newsList.add(new News("Mua 1 tặng 1", "url_anh_2", "Nội dung ưu đãi 2"));
+
+        if (newsAdapter != null) {
+            newsAdapter.notifyDataSetChanged();
+        }
         String[] placeholderImages = {
                 "https://via.placeholder.com/400x200/FF9800/FFFFFF?text=Uu+ Dai+1",
                 "https://via.placeholder.com/400x200/E91E63/FFFFFF?text=Uu+ Dai+2",
@@ -239,15 +283,18 @@ public class MainActivity extends AppCompatActivity {
                 "Combo bỏng nước chỉ 49.000đ khi mua vé online",
                 "Sự kiện ra mắt phim mới - Nhận quà tặng hấp dẫn"
         };
+
         for (int i = 0; i < placeholderImages.length; i++) {
             News news = new News();
-            news.setName(names[i]);
-            news.setPoster(placeholderImages[i]);
+
+            // SỬA TẠI ĐÂY: Gán trực tiếp vào thuộc tính public title và imageUrl của bạn
+            news.title = names[i];
+            news.imageUrl = placeholderImages[i]; // (Nếu dòng dưới của bạn kia bị lỗi poster)
+
             newsList.add(news);
         }
         newsAdapter.notifyDataSetChanged();
     }
-
     private void loadBannersFromFirebase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Banner").get().addOnCompleteListener(task -> {

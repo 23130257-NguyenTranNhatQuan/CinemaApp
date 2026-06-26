@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 import android.view.View;
+import android.widget.Button;
+import android.content.Intent;
 
 public class SeatSelectionActivity extends AppCompatActivity {
 
@@ -118,40 +120,58 @@ public class SeatSelectionActivity extends AppCompatActivity {
                             });
                 });
 
-        // Bắt sự kiện chọn ghế tính tiền
-        seatMapView.setOnSeatSelectedListener(new SeatMapView.OnSeatSelectedListener() {
-            @Override
-            public void onSeatSelectionChanged(List<SeatMapView.Seat> selectedSeats) {
-                if (selectedSeats.isEmpty()) {
-                    tvSelectedSeatNames.setText("Chỗ ngồi");
-                    tvTotalPrice.setText("0đ");
-                    btnClearSeats.setVisibility(View.GONE);
+            seatMapView.setOnSeatSelectedListener(new SeatMapView.OnSeatSelectedListener() {
+                @Override
+                public void onSeatSelectionChanged(List<SeatMapView.Seat> selectedSeats) {
+                    if (selectedSeats.isEmpty()) {
+                        tvSelectedSeatNames.setText("Chỗ ngồi");
+                        tvTotalPrice.setText("0đ");
+                        btnClearSeats.setVisibility(View.GONE);
+                        return;
+                    }
+
+                    StringBuilder names = new StringBuilder("Chỗ ngồi: ");
+                    long totalPrice = 0;
+
+                    for (int i = 0; i < selectedSeats.size(); i++) {
+                        SeatMapView.Seat seat = selectedSeats.get(i);
+                        names.append(seat.name);
+                        if (i < selectedSeats.size() - 1) names.append(", ");
+
+                        if (seat.type == 1) totalPrice += 80000;
+                        else if (seat.type == 2) totalPrice += 110000;
+                        else if (seat.type == 3) totalPrice += 220000;
+                    }
+
+                    tvSelectedSeatNames.setText(names.toString());
+                    tvTotalPrice.setText(String.format("%,dđ", totalPrice));
+                    btnClearSeats.setVisibility(View.VISIBLE);
+                }
+            });
+
+            // 2. Logic nút "Mua vé"
+            Button btnBuyTicket = findViewById(R.id.btnBuyTicket);
+            btnBuyTicket.setOnClickListener(v -> {
+                List<SeatMapView.Seat> selected = seatMapView.getSelectedSeats();
+                if (selected == null || selected.isEmpty()) {
+                    android.widget.Toast.makeText(this, "Vui lòng chọn ghế!", android.widget.Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                StringBuilder names = new StringBuilder("Chỗ ngồi: ");
-                long totalPrice = 0;
+                Intent intent = new Intent(this, ComboSelectionActivity.class);
+                intent.putExtra("MOVIE_TITLE", tvMovieName.getText().toString());
+                intent.putExtra("TOTAL_PRICE", tvTotalPrice.getText().toString());
 
-                for (int i = 0; i < selectedSeats.size(); i++) {
-                    SeatMapView.Seat seat = selectedSeats.get(i);
-                    names.append(seat.name);
-                    if (i < selectedSeats.size() - 1) names.append(", ");
+                ArrayList<String> seatNames = new ArrayList<>();
+                for (SeatMapView.Seat s : selected) seatNames.add(s.name);
+                intent.putStringArrayListExtra("SELECTED_SEATS", seatNames);
 
-                    // Tính tiền tạm tính theo loại ghế ví dụ
-                    if (seat.type == 1) totalPrice += 80000;      // Thường
-                    else if (seat.type == 2) totalPrice += 110000; // VIP
-                    else if (seat.type == 3) totalPrice += 220000; // Đôi
-                }
+                startActivity(intent);
+            });
 
-                tvSelectedSeatNames.setText(names.toString());
-                tvTotalPrice.setText(String.format("%,dđ", totalPrice));
-                btnClearSeats.setVisibility(View.VISIBLE);
-            }
-        });
-
-        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-    }
-
+            // 3. Nút quay lại
+            findViewById(R.id.btnBack).setOnClickListener(v -> finish());
+        }
     private void buildSeatMap(int rows, int cols, Set<String> booked) {
         String[] labels = {"A","B","C","D","E","F","G","H","I","J"};
         List<SeatMapView.Seat> list = new ArrayList<>();
