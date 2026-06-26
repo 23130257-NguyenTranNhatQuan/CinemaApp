@@ -213,7 +213,9 @@ public class SeatMapView extends View {
 
             float left = paddingLeftRight + seat.col * (seatSize + seatGap);
             float top = paddingTop + seat.row * (seatSize + rowGap);
-            float right = left + (seat.type == 3 ? (seatSize * 2 + seatGap) : seatSize);
+            float right = seat.type == 3
+                    ? paddingLeftRight + (seat.col + 2) * (seatSize + seatGap) - seatGap
+                    : left + seatSize;
             float bottom = top + seatSize;
 
             RectF rect = new RectF(left, top, right, bottom);
@@ -232,11 +234,25 @@ public class SeatMapView extends View {
 
             canvas.drawRoundRect(rect, seatSize * 0.2f, seatSize * 0.2f, paintSeat);
 
-            Paint.FontMetrics fm = paintText.getFontMetrics();
-            float textY = rect.centerY() - (fm.top + fm.bottom) / 2;
-            canvas.drawText(seat.type == 0 ? "·" : seat.name, rect.centerX(), textY, paintText);
+            if (seat.type == 3) {
+                String partnerName = "";
+                for (Seat s : seatList) {
+                    if (s != seat && s.row == seat.row && s.type == 3 && s.col == seat.col + 1) {
+                        partnerName = s.name;
+                        break;
+                    }
+                }
+                Paint.FontMetrics fm3 = paintText.getFontMetrics();
+                float textY = rect.centerY() - (fm3.top + fm3.bottom) / 2;
+                paintText.setTextSize(seatSize * 0.28f); // nhỏ hơn để 2 tên vừa 1 dòng
+                canvas.drawText(seat.name + "    " + partnerName, rect.centerX(), textY, paintText);
+                paintText.setTextSize(seatSize * 0.32f); // reset lại
+            } else {
+                Paint.FontMetrics fm = paintText.getFontMetrics();
+                float textY = rect.centerY() - (fm.top + fm.bottom) / 2;
+                canvas.drawText(seat.type == 0 ? "·" : seat.name, rect.centerX(), textY, paintText);
+            }
         }
-
         // Vẽ vùng trung tâm nếu có
         if (czStartRow != null) {
             drawZoneRect(canvas, czStartRow, czEndRow, czStartCol, czEndCol, paintBorder, false);
@@ -262,8 +278,15 @@ public class SeatMapView extends View {
     }
 
     private boolean isSecondOfCouple(Seat seat) {
-        for (Seat s : seatList) {
-            if (s != seat && s.row == seat.row && s.type == 3 && s.col == seat.col - 1) return true;
+        // Ghế đôi ghép cặp theo col: (0,1), (2,3), (4,5)...
+        // Col lẻ (index 1,3,5...) là ghế thứ 2, bỏ qua để tránh vẽ đè
+        if (seat.col % 2 == 1) {
+            // Kiểm tra xem col trước đó có phải ghế đôi không
+            for (Seat s : seatList) {
+                if (s != seat && s.row == seat.row && s.type == 3 && s.col == seat.col - 1) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -323,10 +346,18 @@ public class SeatMapView extends View {
     private void handleSeatTap(float x, float y) {
         for (Seat seat : seatList) {
             if (!editMode && seat.isBooked) continue;
+            if (seat.type == 3 && isSecondOfCouple(seat)) continue;
 
             float left = paddingLeftRight + seat.col * (seatSize + seatGap);
             float top = paddingTop + seat.row * (seatSize + rowGap);
-            float right = left + (seat.type == 3 ? (seatSize * 2 + seatGap) : seatSize);
+            // Ghế đôi: right chỉ kéo đến hết col kế tiếp THỰC SỰ
+            float right;
+            if (seat.type == 3) {
+                // Tìm partner để tính right chính xác
+                right = paddingLeftRight + (seat.col + 2) * (seatSize + seatGap) - seatGap;
+            } else {
+                right = left + seatSize;
+            }
             float bottom = top + seatSize;
 
             if (x >= left && x <= right && y >= top && y <= bottom) {
@@ -349,9 +380,13 @@ public class SeatMapView extends View {
 
     private void toggleDoubleSeat(Seat tapped) {
         Seat partner = null;
+        // Tìm partner đúng cặp: col chẵn đi với col+1, col lẻ đi với col-1
+        int partnerCol = (tapped.col % 2 == 0) ? tapped.col + 1 : tapped.col - 1;
         for (Seat s : seatList) {
-            if (s == tapped || s.row != tapped.row || s.type != 3) continue;
-            if (Math.abs(s.col - tapped.col) == 1) { partner = s; break; }
+            if (s != tapped && s.row == tapped.row && s.type == 3 && s.col == partnerCol) {
+                partner = s;
+                break;
+            }
         }
         boolean newState = !tapped.isSelected;
         tapped.isSelected = newState;
