@@ -25,12 +25,24 @@
             android:textStyle="bold" />
     </RelativeLayout>
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:background="#FFFFFF"
+        app:tabMode="scrollable"
+        app:tabIndicatorColor="#E91E63"
+        app:tabSelectedTextColor="#E91E63"
+        app:tabTextColor="#777777"
+        app:tabIndicatorHeight="3dp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCombo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar"
-        android:layout_below="@+id/toolbar"
+        android:layout_below="@+id/tabLayout"
         android:padding="14dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_combo"

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body{
+            font-family:Arial,sans-serif;
+            background:#f5f5f5;
+            margin:0;
+            padding:15px;
+        }
+
+        .container{
+            background:#fff;
+            padding:20px;
+            border-radius:12px;
+            box-shadow:0 4px 10px rgba(0,0,0,.1);
+        }
+
+        .left{
+            border-bottom:2px dashed #eee;
+            padding-bottom:15px;
+        }
+
+        .right{
+            background:#d82d8b;
+            color:white;
+            padding:20px;
+            border-radius:8px;
+            text-align:center;
+            margin-top:20px;
+        }
+
+        .qr-code{
+            background:white;
+            padding:15px;
+            border-radius:8px;
+            display:inline-block;
+        }
+
+        button{
+            background:white;
+            color:#d82d8b;
+            border:none;
+            padding:15px;
+            border-radius:8px;
+            width:100%;
+            font-size:18px;
+            font-weight:bold;
+            margin-top:15px;
+        }
+
+        #timer{
+            color:red;
+            font-size:24px;
+            font-weight:bold;
+        }
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="left">
+
+        <h3>Thông tin đơn hàng</h3>
+
+        <p>
+            <strong>Nhà cung cấp:</strong>
+            CINESTAR
+        </p>
+
+        <p>
+            <strong>Mã đơn:</strong>
+            <span id="orderId"></span>
+        </p>
+
+        <p>
+            <strong>Số tiền:</strong>
+            <span id="amount"
+                  style="color:#d82d8b;font-size:22px;font-weight:bold;">
+            </span>
+        </p>
+
+        <p>Đơn hàng sẽ hết hạn sau:</p>
+
+        <div id="timer">05:00</div>
+
+    </div>
+
+    <div class="right">
+
+        <div class="qr-code">
+            <img
+                    src="https://img.vietqr.io/image/VCB-0123456789-print.png"
+                    width="220"
+                    alt="QR Code">
+        </div>
+
+        <p style="color:white">
+            Quét mã bằng ứng dụng ngân hàng hoặc Ví điện tử
+        </p>
+
+        <button id="btnSuccess">
+            Xác nhận đã thanh toán
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+    document.getElementById("btnSuccess")
+            .addEventListener("click",function(){
+
+        location.href="payment_success";
+
+    });
+
+    let timeLeft=300;
+
+    const timer=document.getElementById("timer");
+
+    const countdown=setInterval(function(){
+
+        let m=Math.floor(timeLeft/60);
+        let s=timeLeft%60;
+
+        timer.innerHTML=
+            String(m).padStart(2,'0')
+            +":"
+            +String(s).padStart(2,'0');
+
+        if(timeLeft<=0){
+
+            clearInterval(countdown);
+
+            timer.innerHTML="ĐÃ HẾT HẠN";
+
+            location.href="payment_timeout";
+        }
+
+        timeLeft--;
+
+    },1000);
+
+</script>
+
+</body>
+</html>

@@ -232,5 +232,14 @@ public class SeatMapView extends View {
         for (Seat s : seatList) s.isSelected = false;
         invalidate();
     }
+        public List<Seat> getSelectedSeats() {
+            List<Seat> selected = new ArrayList<>();
+            for (Seat s : seatList) {
+                if (s.isSelected) {
+                    selected.add(s);
+                }
+            }
+            return selected;
+        }
 
 }
