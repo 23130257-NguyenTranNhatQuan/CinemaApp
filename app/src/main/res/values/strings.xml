@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">App đặt vé xem phim</string>
+
+    <string-array name="movie_formats">
+        <item>2D</item>
+        <item>3D</item>
+        <item>4D</item>
+        <item>IMAX</item>
+    </string-array>
+
+    <string-array name="age_ratings">
+        <item>P</item>
+        <item>K</item>
+        <item>T13</item>
+        <item>T16</item>
+        <item>T18</item>
+    </string-array>
 </resources>

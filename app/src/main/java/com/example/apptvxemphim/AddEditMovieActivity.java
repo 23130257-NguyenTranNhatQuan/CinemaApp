@@ -2,7 +2,9 @@ package com.example.apptvxemphim;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,7 +16,8 @@ import java.util.Map;
 
 public class AddEditMovieActivity extends AppCompatActivity {
 
-    private EditText etTitle, etPoster, etTrailer, etDirector, etCast, etDuration, etAge, etFormat, etGenres, etDescription;
+    private EditText etTitle, etPoster, etTrailer, etDirector, etCast, etDuration, etGenres, etDescription;
+    private Spinner spinnerFormat, spinnerAge;
     private TextView tvHeader;
     private String movieId = null; // Biến lưu trữ ID nếu ở chế độ Sửa
     private FirebaseFirestore db;
@@ -34,9 +37,20 @@ public class AddEditMovieActivity extends AppCompatActivity {
         etDirector = findViewById(R.id.et_movie_director);
         etCast = findViewById(R.id.et_movie_cast);
         etDuration = findViewById(R.id.et_movie_duration);
-        etAge = findViewById(R.id.et_movie_age);
-        etFormat = findViewById(R.id.et_movie_format);
+        spinnerFormat = findViewById(R.id.spinner_format);
+        spinnerAge = findViewById(R.id.spinner_age);
         etGenres = findViewById(R.id.et_movie_genres);
+
+        // Setup spinners with custom layouts
+        ArrayAdapter<CharSequence> formatAdapter = ArrayAdapter.createFromResource(this,
+                R.array.movie_formats, R.layout.spinner_item_white);
+        formatAdapter.setDropDownViewResource(R.layout.dropdown_item_purple);
+        spinnerFormat.setAdapter(formatAdapter);
+
+        ArrayAdapter<CharSequence> ageAdapter = ArrayAdapter.createFromResource(this,
+                R.array.age_ratings, R.layout.spinner_item_white);
+        ageAdapter.setDropDownViewResource(R.layout.dropdown_item_purple);
+        spinnerAge.setAdapter(ageAdapter);
         etDescription = findViewById(R.id.et_movie_description);
         Button btnSave = findViewById(R.id.btn_save_movie);
 
@@ -61,8 +75,20 @@ public class AddEditMovieActivity extends AppCompatActivity {
                     etDirector.setText(movie.getDirector());
                     etCast.setText(movie.getCast());
                     etDuration.setText(String.valueOf(movie.getDuration()));
-                    etAge.setText(movie.getAge());
-                    etFormat.setText(movie.getFormat());
+                    // Set spinner selections based on movie data
+                    String format = movie.getFormat();
+                    if (format != null) {
+                        ArrayAdapter formatAdapter = (ArrayAdapter) spinnerFormat.getAdapter();
+                        int pos = formatAdapter.getPosition(format);
+                        if (pos >= 0) spinnerFormat.setSelection(pos);
+                    }
+
+                    String age = movie.getAge();
+                    if (age != null) {
+                        ArrayAdapter ageAdapter = (ArrayAdapter) spinnerAge.getAdapter();
+                        int pos = ageAdapter.getPosition(age);
+                        if (pos >= 0) spinnerAge.setSelection(pos);
+                    }
                     etDescription.setText(movie.getDescription());
 
                     // Chuyển mảng List thành chuỗi cách nhau bằng dấu phẩy
@@ -100,8 +126,12 @@ public class AddEditMovieActivity extends AppCompatActivity {
         movieData.put("director", etDirector.getText().toString().trim());
         movieData.put("cast", etCast.getText().toString().trim());
         movieData.put("duration", Long.parseLong(durationStr));
-        movieData.put("age", etAge.getText().toString().trim());
-        movieData.put("format", etFormat.getText().toString().trim());
+        // Get selected values from Spinner
+        String selectedFormat = spinnerFormat.getSelectedItem().toString();
+        String selectedAge = spinnerAge.getSelectedItem().toString();
+        
+        movieData.put("age", selectedAge);
+        movieData.put("format", selectedFormat);
         movieData.put("genres", genresList);
         movieData.put("description", etDescription.getText().toString().trim());
 

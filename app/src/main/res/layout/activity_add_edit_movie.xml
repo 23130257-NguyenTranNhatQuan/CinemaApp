@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/white"
     android:padding="16dp">
 
     <LinearLayout
@@ -15,36 +15,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thêm Phim Mới"
-            android:textColor="@color/white"
+            android:textColor="@color/purple_cinestar"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginBottom="16dp"/>
 
-        <EditText android:id="@+id/et_movie_title" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Tên phim" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/et_movie_title" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Tên phim" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
 
-        <EditText android:id="@+id/et_movie_poster" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Link Ảnh Poster" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/et_movie_poster" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Link Ảnh Poster" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
 
-        <EditText android:id="@+id/et_movie_trailer" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Link YouTube Trailer" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/et_movie_trailer" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Link YouTube Trailer" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
 
-        <EditText android:id="@+id/et_movie_director" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Đạo diễn" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/et_movie_director" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Đạo diễn" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
 
-        <EditText android:id="@+id/et_movie_cast" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Diễn viên" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/et_movie_cast" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Diễn viên" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="12dp">
-            <EditText android:id="@+id/et_movie_duration" android:layout_width="0dp" android:layout_weight="1" android:layout_height="50dp" android:hint="Thời lượng (Phút)" android:inputType="number" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/et_movie_age" android:layout_width="0dp" android:layout_weight="1" android:layout_height="50dp" android:hint="Độ tuổi (VD: 18+)" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginEnd="8dp"/>
-            <EditText android:id="@+id/et_movie_format" android:layout_width="0dp" android:layout_weight="1" android:layout_height="50dp" android:hint="Định dạng (2D)" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp"/>
+            <EditText android:id="@+id/et_movie_duration" android:layout_width="0dp" android:layout_weight="1" android:layout_height="50dp" android:hint="Thời lượng (Phút)" android:inputType="number" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginEnd="8dp"/>
+            <Spinner android:id="@+id/spinner_format" android:layout_width="0dp" android:layout_weight="1" android:layout_height="50dp" android:layout_marginEnd="8dp" android:background="@drawable/bg_spinner_purple"/>
+            <Spinner android:id="@+id/spinner_age" android:layout_width="0dp" android:layout_weight="1" android:layout_height="50dp" android:background="@drawable/bg_spinner_purple"/>
         </LinearLayout>
 
-        <EditText android:id="@+id/et_movie_genres" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Thể loại (Cách nhau bằng dấu phẩy: Hành động, Hài)" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginBottom="12dp"/>
+        <EditText android:id="@+id/et_movie_genres" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Thể loại (Cách nhau bằng dấu phẩy: Hành động, Hài)" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
 
-        <EditText android:id="@+id/et_movie_description" android:layout_width="match_parent" android:layout_height="120dp" android:hint="Mô tả phim..." android:gravity="top|start" android:inputType="textMultiLine" android:background="#333333" android:textColor="@color/white" android:textColorHint="#888888" android:padding="12dp" android:layout_marginBottom="24dp"/>
+        <EditText android:id="@+id/et_movie_description" android:layout_width="match_parent" android:layout_height="120dp" android:hint="Mô tả phim..." android:gravity="top|start" android:inputType="textMultiLine" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="24dp"/>
 
         <Button
             android:id="@+id/btn_save_movie"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:backgroundTint="#E50914"
+            android:backgroundTint="@color/primary_pink"
             android:text="LƯU THÔNG TIN"
             android:textColor="@color/white"
             android:textStyle="bold"

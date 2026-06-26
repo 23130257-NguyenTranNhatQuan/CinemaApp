@@ -3,16 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
+    android:background="@color/white"
     android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         android:text="Dashboard Admin"
-        android:textColor="@color/white"
+        android:textColor="@color/purple_cinestar"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:text="Quản lý hệ thống rạp chiếu phim"
-        android:textColor="#AAAAAA"
+        android:textColor="@color/purple_cinestar"
         android:textSize="14sp" />
 
     <GridLayout
@@ -39,7 +39,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardBackgroundColor="#222222"
+            app:cardBackgroundColor="@color/purple_dark"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
 
@@ -49,11 +49,12 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView
+                <TextView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_camera"
-                    app:tint="#FF9800" />
+                    android:gravity="center"
+                    android:text="🎬"
+                    android:textSize="28sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -73,7 +74,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardBackgroundColor="#222222"
+            app:cardBackgroundColor="@color/purple_dark"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
 
@@ -83,11 +84,12 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView
+                <TextView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_mapmode"
-                    app:tint="#4CAF50" />
+                    android:gravity="center"
+                    android:text="🏢"
+                    android:textSize="28sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -107,7 +109,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardBackgroundColor="#222222"
+            app:cardBackgroundColor="@color/purple_dark"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
 
@@ -117,11 +119,12 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView
+                <TextView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_agenda"
-                    app:tint="#03A9F4" />
+                    android:gravity="center"
+                    android:text="🎟️"
+                    android:textSize="28sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -141,7 +144,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
-            app:cardBackgroundColor="#222222"
+            app:cardBackgroundColor="@color/purple_dark"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
 
@@ -151,11 +154,12 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView
+                <TextView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@android:drawable/ic_menu_myplaces"
-                    app:tint="#E91E63" />
+                    android:gravity="center"
+                    android:text="👥"
+                    android:textSize="28sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -176,7 +180,7 @@
             android:layout_columnWeight="2"
             android:layout_columnSpan="2"
             android:layout_margin="8dp"
-            app:cardBackgroundColor="#222222"
+            app:cardBackgroundColor="@color/purple_cinestar"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
 
@@ -186,12 +190,13 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <ImageView
+                <TextView
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
-                    app:tint="#9C27B0" />
+                    android:layout_marginEnd="12dp"
+                    android:gravity="center"
+                    android:text="📊"
+                    android:textSize="28sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -211,9 +216,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:layout_marginHorizontal="8dp"
-        android:backgroundTint="#E50914"
+        android:backgroundTint="@color/primary_pink"
         android:text="Đăng xuất"
         android:textColor="@color/white"
         android:textStyle="bold"/>
-
 </LinearLayout>
