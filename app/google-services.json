@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "590586581626",
+    "firebase_url": "https://cinemaapp-90dfa-default-rtdb.firebaseio.com",
     "project_id": "cinemaapp-90dfa",
     "storage_bucket": "cinemaapp-90dfa.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.apptvxemphim"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "590586581626-jnb328c7ph1kk717uusqq960deqac1hh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.apptvxemphim",
+            "certificate_hash": "4454f0b22c060c707c4249917cb3b71eaf72a109"
+          }
+        },
+        {
+          "client_id": "590586581626-9o7cfvvnchjkvbth7pn23e201f3a6f2l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC76TaUqg0g2s6c8BBhwfC7uVtBU_7dVUc"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "590586581626-9o7cfvvnchjkvbth7pn23e201f3a6f2l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
