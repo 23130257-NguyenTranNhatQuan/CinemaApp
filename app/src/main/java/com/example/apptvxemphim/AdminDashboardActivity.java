@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
-    private CardView cardMovies, cardCinemas, cardTickets, cardUsers, cardStats;
+    private CardView cardMovies, cardCinemas, cardTickets, cardUsers, cardStats, cardHalls;
     private Button btnLogout;
 
     @Override
@@ -21,6 +21,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         // 1. Ánh xạ giao diện
         cardMovies = findViewById(R.id.card_manage_movies);
         cardCinemas = findViewById(R.id.card_manage_cinemas);
+        cardHalls = findViewById(R.id.card_manage_halls);
         cardTickets = findViewById(R.id.card_manage_tickets);
         cardUsers = findViewById(R.id.card_manage_users);
         cardStats = findViewById(R.id.card_statistics);
@@ -37,6 +38,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
             Intent intent = new Intent(AdminDashboardActivity.this, ManageCinemasActivity.class);
             startActivity(intent);
             Toast.makeText(this, "Đang mở Quản lý Rạp...", Toast.LENGTH_SHORT).show();
+        });
+
+        cardHalls.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageHallsActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "Đang mở Quản lý Phòng chiếu...", Toast.LENGTH_SHORT).show();
         });
 
         cardTickets.setOnClickListener(v -> {

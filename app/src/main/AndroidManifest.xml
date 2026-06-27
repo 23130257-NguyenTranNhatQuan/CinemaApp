@@ -63,6 +63,9 @@
         <activity android:name=".PaymentActivity" />
         <activity android:name=".PaymentResultActivity" />
         <activity android:name=".NewsDetailActivity" />
+        <activity android:name=".ManageHallsActivity" />
+        <activity android:name=".HallCreateActivity" />
+        <activity android:name=".HallEditActivity" />
     </application>
 
 </manifest>
