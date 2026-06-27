@@ -1,23 +1,24 @@
 package com.example.apptvxemphim;
 
-import android.content.Intent; // Đã thêm thư viện Intent
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.apptvxemphim.News;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -30,7 +31,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView rcvMovies;
-    private MovieAdapter movieAdapter;
+    private MovieCarouselAdapter movieCarouselAdapter;
     private List<Movie> movieList;
 
     private RecyclerView rcvComingSoon;
@@ -43,14 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView[] bannerImages;
     private ImageButton btnPrev, btnNext;
-    private LinearLayout layoutDots;
     private ImageView[] dots;
     private int currentPage = 0;
     private int totalBanners = 0;
     private Handler sliderHandler = new Handler(Looper.getMainLooper());
-    private Timer slideTimer;
-    private TimerTask slideTimerTask;
-    private static final long SLIDE_DELAY = 5000; // 5 seconds
     private List<Banner> bannerList = new ArrayList<>();
 
     BottomNavigationView bottomNavigationView;
@@ -79,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Chuyển sang Tin tức", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == R.id.nav_account) {
-                    // ĐÃ SỬA LẠI: Chuyển thẳng sang trang ProfileActivity
                     Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
                     startActivity(intent);
                     return true;
@@ -88,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Initialize banner ImageViews
         bannerImages = new ImageView[]{
                 findViewById(R.id.banner1),
                 findViewById(R.id.banner2),
@@ -99,15 +94,14 @@ public class MainActivity extends AppCompatActivity {
         // Verify ImageViews were found
         for (int i = 0; i < bannerImages.length; i++) {
             if (bannerImages[i] == null) {
-                Log.e("FirebaseTest", "banner" + (i+1) + " ImageView is NULL!");
+                Log.e("FirebaseTest", "banner" + (i + 1) + " ImageView is NULL!");
             } else {
-                Log.d("FirebaseTest", "banner" + (i+1) + " ImageView found: " + bannerImages[i]);
+                Log.d("FirebaseTest", "banner" + (i + 1) + " ImageView found: " + bannerImages[i]);
             }
         }
 
         btnPrev = findViewById(R.id.btn_prev);
         btnNext = findViewById(R.id.btn_next);
-        layoutDots = findViewById(R.id.layout_dots);
 
         dots = new ImageView[]{
                 findViewById(R.id.dot1),
@@ -119,115 +113,135 @@ public class MainActivity extends AppCompatActivity {
         // Verify dots were found
         for (int i = 0; i < dots.length; i++) {
             if (dots[i] == null) {
-                Log.e("FirebaseTest", "dot" + (i+1) + " ImageView is NULL!");
+                Log.e("FirebaseTest", "dot" + (i + 1) + " ImageView is NULL!");
             }
         }
 
         // Load placeholder banners immediately so user sees something
         loadPlaceholderBanners();
-
-        // Then try to load from Firebase
         loadBannersFromFirebase();
 
         setupDots(0);
         updateArrowsVisibility(0);
 
-        // Setup navigation arrows
         btnPrev.setOnClickListener(v -> {
-            if (currentPage > 0) {
-                currentPage--;
-            } else {
-                currentPage = totalBanners - 1;
-            }
+            if (currentPage > 0) currentPage--;
+            else currentPage = totalBanners - 1;
             showBanner(currentPage);
         });
 
         btnNext.setOnClickListener(v -> {
-            if (currentPage < totalBanners - 1) {
-                currentPage++;
-            } else {
-                currentPage = 0;
-            }
+            if (currentPage < totalBanners - 1) currentPage++;
+            else currentPage = 0;
             showBanner(currentPage);
         });
 
         // Setup Coming Soon Movies (horizontal)
         rcvComingSoon = findViewById(R.id.rcv_coming_soon);
-        LinearLayoutManager horizontalLayout = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        rcvComingSoon.setLayoutManager(horizontalLayout);
-
+        rcvComingSoon.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         comingSoonList = new ArrayList<>();
         comingSoonAdapter = new ComingSoonMovieAdapter(comingSoonList);
         rcvComingSoon.setAdapter(comingSoonAdapter);
 
-        // Setup Now Showing Movies (horizontal)
+        // Setup Now Showing Movies - RecyclerView carousel with snap + scale effect
         rcvMovies = findViewById(R.id.rcv_movies);
-        rcvMovies.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        LinearLayoutManager carouselLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false) {
+            @Override
+            public void onLayoutCompleted(RecyclerView.State state) {
+                super.onLayoutCompleted(state);
+                scaleCarouselItems();
+            }
+
+            @Override
+            public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
+                int scrolled = super.scrollHorizontallyBy(dx, recycler, state);
+                scaleCarouselItems();
+                return scrolled;
+            }
+
+            private void scaleCarouselItems() {
+                if (getChildCount() == 0) return;
+                int centerX = (getWidth() / 2);
+                for (int i = 0; i < getChildCount(); i++) {
+                    View child = getChildAt(i);
+                    if (child == null) continue;
+                    int childCenter = (child.getLeft() + child.getRight()) / 2;
+                    int distance = Math.abs(childCenter - centerX);
+                    float scale = 1.0f - (0.18f * Math.min(1.0f, (float) distance / ((float) getWidth() * 0.9f)));
+                    float alpha = 1.0f - (0.4f * Math.min(1.0f, (float) distance / ((float) getWidth() * 0.9f)));
+                    child.setScaleX(scale);
+                    child.setScaleY(scale);
+                    child.setAlpha(alpha);
+                }
+            }
+        };
+        rcvMovies.setLayoutManager(carouselLayoutManager);
+
+        // Attach snap helper for snapping to center
+        LinearSnapHelper snapHelper = new LinearSnapHelper();
+        snapHelper.attachToRecyclerView(rcvMovies);
 
         movieList = new ArrayList<>();
-        movieAdapter = new MovieAdapter(movieList);
-        rcvMovies.setAdapter(movieAdapter);
+        movieCarouselAdapter = new MovieCarouselAdapter(movieList);
+        rcvMovies.setAdapter(movieCarouselAdapter);
 
         // Setup News
         rcvNews = findViewById(R.id.rcv_news);
         rcvNews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
         newsList = new ArrayList<>();
-        newsAdapter = new NewsAdapter(newsList);
+        newsAdapter = new NewsAdapter(newsList, MainActivity.this);
         rcvNews.setAdapter(newsAdapter);
 
         // Load data from Firebase
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        // Load coming soon movies from "ComingMovie" collection
         db.collection("ComingMovie").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 comingSoonList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    Movie movie = document.toObject(Movie.class);
-                    comingSoonList.add(movie);
+                    try {
+                        Movie movie = document.toObject(Movie.class);
+                        comingSoonList.add(movie);
+                    } catch (Exception e) {
+                        Log.e("Loi_Firebase", "Phim sắp chiếu bị lỗi kiểu dữ liệu ở ID: " + document.getId() + " - " + e.getMessage());
+                    }
                 }
                 comingSoonAdapter.notifyDataSetChanged();
-                Log.d("FirebaseTest", "Loaded " + comingSoonList.size() + " coming soon movies");
-            } else {
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu phim sắp chiếu", task.getException());
-                // Load placeholder data if Firebase fails
-                loadPlaceholderComingSoon();
             }
         });
 
-        // Load now showing movies from "Movie" collection
         db.collection("Movie").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 movieList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    Movie movie = document.toObject(Movie.class);
-                    movieList.add(movie);
+                    try {
+                        Movie movie = document.toObject(Movie.class);
+                        movieList.add(movie);
+                    } catch (Exception e) {
+                        Log.e("Loi_Firebase", "Phim đang chiếu bị lỗi kiểu dữ liệu ở ID: " + document.getId() + " - " + e.getMessage());
+                    }
                 }
-                movieAdapter.notifyDataSetChanged();
-            } else {
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu phim đang chiếu", task.getException());
+                movieCarouselAdapter.notifyDataSetChanged();
+                // Trigger initial scale after data load
+                rcvMovies.post(() -> carouselLayoutManager.scrollHorizontallyBy(0, null, null));
             }
         });
 
-        // Load news from "News" collection
         db.collection("News").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
+            if (task.isSuccessful() && task.getResult() != null) {
                 newsList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     News news = document.toObject(News.class);
                     newsList.add(news);
                 }
                 newsAdapter.notifyDataSetChanged();
-                Log.d("FirebaseTest", "Loaded " + newsList.size() + " news items");
             } else {
+                Log.e("Loi_Firebase", "Lỗi tải tin tức: " + (task.getException() != null ? task.getException().getMessage() : "Unknown"));
                 Log.w("FirebaseTest", "Lỗi lấy dữ liệu tin tức", task.getException());
-                // Load placeholder news if Firebase fails
                 loadPlaceholderNews();
             }
         });
     }
-
     private void loadPlaceholderComingSoon() {
         comingSoonList.clear();
         String[] placeholderPosters = {
@@ -247,8 +261,16 @@ public class MainActivity extends AppCompatActivity {
         comingSoonAdapter.notifyDataSetChanged();
     }
 
+
     private void loadPlaceholderNews() {
         newsList.clear();
+        // Tạo dữ liệu mẫu kiểu News
+        newsList.add(new News("Ưu đãi đặc biệt", "url_anh_1", "Nội dung ưu đãi 1"));
+        newsList.add(new News("Mua 1 tặng 1", "url_anh_2", "Nội dung ưu đãi 2"));
+
+        if (newsAdapter != null) {
+            newsAdapter.notifyDataSetChanged();
+        }
         String[] placeholderImages = {
                 "https://via.placeholder.com/400x200/FF9800/FFFFFF?text=Uu+ Dai+1",
                 "https://via.placeholder.com/400x200/E91E63/FFFFFF?text=Uu+ Dai+2",
@@ -264,60 +286,46 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < placeholderImages.length; i++) {
             News news = new News();
-            news.setName(names[i]);
-            news.setPoster(placeholderImages[i]);
+
+            // SỬA TẠI ĐÂY: Gán trực tiếp vào thuộc tính public title và imageUrl của bạn
+            news.title = names[i];
+            news.imageUrl = placeholderImages[i]; // (Nếu dòng dưới của bạn kia bị lỗi poster)
+
             newsList.add(news);
         }
         newsAdapter.notifyDataSetChanged();
     }
-
     private void loadBannersFromFirebase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Log.d("FirebaseTest", "Starting to load banners from Firebase...");
         db.collection("Banner").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Log.d("FirebaseTest", "Firebase query successful. Documents found: " + task.getResult().size());
                 bannerList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    Log.d("FirebaseTest", "Document ID: " + document.getId() + ", Data: " + document.getData());
                     Banner banner = document.toObject(Banner.class);
                     bannerList.add(banner);
-                    Log.d("FirebaseTest", "Loaded banner: " + banner.getBanner() + " order: " + banner.getOrder());
                 }
-                // Sort by order
                 Collections.sort(bannerList, (b1, b2) -> Integer.compare(b1.getOrder(), b2.getOrder()));
-                // Update totalBanners to actual count
                 totalBanners = bannerList.size();
-                Log.d("FirebaseTest", "Total banners loaded: " + totalBanners);
-
                 if (totalBanners > 0) {
-                    // Load images into ImageViews
                     loadBannerImages();
-                    // Show first banner
                     showBanner(0);
-                    // Start auto-slide
                     startAutoSlide();
                 } else {
-                    Log.w("FirebaseTest", "No banners found in Firebase, loading placeholders");
                     loadPlaceholderBanners();
                 }
             } else {
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu banner", task.getException());
-                Log.w("FirebaseTest", "Loading placeholder banners instead");
                 loadPlaceholderBanners();
             }
         });
     }
 
     private void loadPlaceholderBanners() {
-        // Fallback: Load placeholder banners if Firebase fails
         String[] placeholderUrls = {
                 "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+1",
                 "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+2",
                 "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+3",
                 "https://via.placeholder.com/800x400/9C27B0/FFFFFF?text=Banner+4"
         };
-
         bannerList.clear();
         for (int i = 0; i < placeholderUrls.length; i++) {
             bannerList.add(new Banner(placeholderUrls[i], i));
@@ -329,11 +337,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadBannerImages() {
-        Log.d("FirebaseTest", "Loading banner images...");
         for (int i = 0; i < bannerImages.length && i < bannerList.size(); i++) {
             String imageUrl = bannerList.get(i).getBanner();
-            Log.d("FirebaseTest", "Loading image " + i + ": " + imageUrl);
-
             com.bumptech.glide.Glide.with(this)
                     .load(imageUrl)
                     .placeholder(android.R.drawable.ic_menu_gallery)
@@ -343,29 +348,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showBanner(int position) {
-        Log.d("FirebaseTest", "Showing banner at position: " + position + ", totalBanners: " + totalBanners);
-        // Hide all banners
+        // Fade out all banners
         for (ImageView banner : bannerImages) {
+            if (banner.getVisibility() == View.VISIBLE) {
+                AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
+                fadeOut.setDuration(400);
+                fadeOut.setFillAfter(true);
+                banner.startAnimation(fadeOut);
+            }
             banner.setVisibility(View.GONE);
         }
-        // Show only the selected banner
+        // Fade in the new active banner
         if (position < bannerImages.length && position < totalBanners && position >= 0) {
-            bannerImages[position].setVisibility(View.VISIBLE);
-            Log.d("FirebaseTest", "Banner " + position + " is now VISIBLE");
-        } else {
-            Log.w("FirebaseTest", "Position " + position + " out of range. totalBanners=" + totalBanners);
+            ImageView activeBanner = bannerImages[position];
+            activeBanner.setVisibility(View.VISIBLE);
+
+            AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+            fadeIn.setDuration(500);
+            fadeIn.setFillAfter(true);
+            activeBanner.startAnimation(fadeIn);
         }
-        // Update dots
         setupDots(position);
     }
 
     private void setupDots(int position) {
         for (int i = 0; i < dots.length; i++) {
-            if (i == position) {
-                dots[i].setSelected(true);
-            } else {
-                dots[i].setSelected(false);
-            }
+            dots[i].setSelected(i == position);
         }
     }
 
@@ -381,35 +389,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void startAutoSlide() {
         stopAutoSlide();
-        slideTimer = new Timer();
-        slideTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                sliderHandler.post(() -> {
-                    if (totalBanners > 0) {
-                        // Advance by exactly 1 banner
-                        if (currentPage < totalBanners - 1) {
-                            currentPage++;
-                        } else {
-                            currentPage = 0;
-                        }
-                        showBanner(currentPage);
-                    }
-                });
-            }
-        };
-        slideTimer.scheduleAtFixedRate(slideTimerTask, SLIDE_DELAY, SLIDE_DELAY);
+        sliderHandler.postDelayed(slideRunnable, 5000);
     }
 
+    private final Runnable slideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (totalBanners > 0) {
+                currentPage = (currentPage + 1) % totalBanners;
+                showBanner(currentPage);
+                sliderHandler.postDelayed(this, 5000);
+            }
+        }
+    };
+
     private void stopAutoSlide() {
-        if (slideTimer != null) {
-            slideTimer.cancel();
-            slideTimer = null;
-        }
-        if (slideTimerTask != null) {
-            slideTimerTask.cancel();
-            slideTimerTask = null;
-        }
+        sliderHandler.removeCallbacks(slideRunnable);
     }
 
     @Override

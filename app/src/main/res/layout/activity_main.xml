@@ -22,6 +22,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/bg_main"
+        android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -144,9 +145,12 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rcv_movies"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="8dp" />
+                android:layout_height="580dp"
+                android:clipToPadding="false"
+                android:paddingStart="60dp"
+                android:paddingEnd="60dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp" />
 
             <TextView
                 android:layout_width="match_parent"

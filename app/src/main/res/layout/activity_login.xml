@@ -46,6 +46,17 @@
         android:backgroundTint="#007BFF"
         android:layout_marginBottom="20dp"/>
 
+    <Button
+        android:id="@+id/btnGoogleLogin"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="ĐĂNG NHẬP BẰNG GOOGLE"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:backgroundTint="#DB4437"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="20dp"/>
+
     <TextView
         android:id="@+id/tvRegisterNow"
         android:layout_width="match_parent"

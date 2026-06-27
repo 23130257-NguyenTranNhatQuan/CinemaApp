@@ -4,111 +4,80 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="14dp"
-    android:background="@android:drawable/dialog_holo_light_frame"
-    android:backgroundTint="#FFFFFF"
-    android:layout_marginBottom="10dp"
+    android:padding="12dp"
+    android:background="#FFFFFF"
+    android:layout_marginBottom="8dp"
+    android:elevation="2dp"
     android:gravity="center_vertical">
 
-    <!-- Ảnh bắp nước được bo góc mịn màng bằng CardView -->
     <androidx.cardview.widget.CardView
-        android:layout_width="65dp"
-        android:layout_height="65dp"
-        app:cardCornerRadius="6dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        app:cardCornerRadius="8dp"
         app:cardElevation="0dp">
-
         <ImageView
             android:id="@+id/imgCombo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#F5F5F5"
-            android:src="@android:drawable/ic_menu_gallery"
-            android:padding="12dp"/>
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_gallery"/>
     </androidx.cardview.widget.CardView>
 
-    <!-- Thông tin chi tiết Combo -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_marginStart="14dp">
-
+        android:layout_marginStart="12dp">
         <TextView
             android:id="@+id/tvComboName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Combo Solo"
+            android:text="Combo Nhà Gấu"
             android:textColor="#222222"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
-
         <TextView
             android:id="@+id/tvComboDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1 Bắp lớn + 1 Nước ngọt siêu to"
-            android:textColor="#777777"
+            android:text="Mô tả chi tiết..."
+            android:textColor="#757575"
             android:textSize="12sp"
-            android:layout_marginTop="3dp" />
-
+            android:maxLines="1" />
         <TextView
             android:id="@+id/tvComboPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="75,000 đ"
+            android:text="249.000 đ"
             android:textColor="#E91E63"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginTop="6dp" />
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Bộ nút tăng giảm số lượng hình tròn tinh tế -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical">
-
-        <!-- Nút giảm (-) hình tròn màu xám nhạt -->
         <TextView
             android:id="@+id/btnMinus"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:text="-"
-            android:textColor="#555555"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@android:drawable/dialog_holo_light_frame"
-            android:backgroundTint="#F0F0F0"/>
-
-        <!-- Số lượng hiển thị ở giữa -->
+            android:background="@drawable/circle_stroke" />
         <TextView
             android:id="@+id/tvQuantity"
-            android:layout_width="32dp"
-            android:layout_height="wrap_content"
+            android:layout_width="35dp"
             android:text="0"
-            android:textColor="#222222"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:gravity="center" />
-
-        <!-- Nút tăng (+) hình tròn màu Hồng/Đỏ chủ đạo -->
+            android:gravity="center"
+            android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/btnPlus"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:text="+"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold"
             android:gravity="center"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@android:drawable/dialog_holo_light_frame"
-            android:backgroundTint="#E91E63"/>
+            android:background="@drawable/circle_filled"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Poster -->
+        <ImageView
+            android:id="@+id/img_detail_poster"
+            android:layout_width="match_parent"
+            android:layout_height="320dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_report_image" />
+
+        <!-- Overlay gradient at bottom of poster -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-40dp"
+            android:background="@drawable/gradient_purple_transparent"
+            android:padding="16dp">
+
+            <!-- Info Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/tv_detail_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tên Phim"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- Duration & Genre -->
+                <TextView
+                    android:id="@+id/tv_detail_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="120 phút - Hành động, Viễn tưởng"
+                    android:textColor="#D4C4EB"
+                    android:textSize="14sp" />
+
+                <!-- Format & Age Rating Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        android:id="@+id/tv_format"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2D"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:background="@color/purple_cinestar"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_age_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="T18"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:background="@color/primary_pink"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <!-- Play Trailer Button -->
+                    <ImageButton
+                        android:id="@+id/btn_watch_trailer"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/circle_button_purple"
+                        android:src="@drawable/ic_play"
+                        android:contentDescription="Xem trailer" />
+
+                </LinearLayout>
+
+                <!-- Director -->
+                <TextView
+                    android:id="@+id/tv_director"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Đạo diễn: "
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <!-- Cast -->
+                <TextView
+                    android:id="@+id/tv_cast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Diễn viên: "
+                    android:textColor="#D4C4EB"
+                    android:textSize="13sp" />
+
+                <!-- Release Date -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="12dp"
+                    android:background="@color/purple_dark"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📅"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tv_release_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Khởi chiếu: 01/01/2024"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Description -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Mô tả phim"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Đang tải nội dung..."
+                    android:textColor="#D4C4EB"
+                    android:lineSpacingExtra="4dp"
+                    android:textSize="14sp" />
+
+                <!-- Bottom spacing -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp" />
+
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/purple_light"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_admin_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Tên người dùng" />
+
+        <TextView
+            android:id="@+id/tv_admin_user_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+                android:textColor="@color/white"
+            android:textSize="13sp"
+            android:layout_marginTop="4dp"
+            android:text="email@example.com" />
+
+        <TextView
+            android:id="@+id/tv_admin_user_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#AAAAAA"
+            android:textSize="13sp"
+            android:layout_marginTop="2dp"
+            android:text="SĐT: 0123456789" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_admin_user_role"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:background="#333333"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:text="Người dùng" />
+</LinearLayout>

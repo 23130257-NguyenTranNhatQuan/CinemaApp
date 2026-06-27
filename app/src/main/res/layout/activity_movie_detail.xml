@@ -2,84 +2,163 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212">
-    
+    android:background="@color/bg_main"
+    android:scrollbars="none">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="24dp">
-        
+        android:orientation="vertical">
+
+        <!-- Poster -->
         <ImageView
             android:id="@+id/img_detail_poster"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="320dp"
             android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_report_image"/>
-        
-        <LinearLayout
+            android:src="@android:drawable/ic_menu_report_image" />
+
+        <!-- Overlay gradient at bottom of poster -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_marginTop="-40dp"
+            android:background="@drawable/gradient_purple_transparent"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/tv_detail_title"
+            <!-- Info Section -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tên Phim"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-            
-            <TextView
-                android:id="@+id/tv_detail_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="120 phút - Hành động, Viễn tưởng"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp"/>
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btn_watch_trailer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="#E50914"
-                android:text="▶ Xem Trailer"
-                android:textColor="@color/white"
-                android:textStyle="bold" />
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/tv_detail_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tên Phim"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Nội dung phim"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                <!-- Duration & Genre -->
+                <TextView
+                    android:id="@+id/tv_detail_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="120 phút - Hành động, Viễn tưởng"
+                    android:textColor="#D4C4EB"
+                    android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tv_detail_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Đang tải nội dung..."
-                android:textColor="#CCCCCC"
-                android:lineSpacingExtra="4dp"
-                android:textSize="14sp" />
+                <!-- Format & Age Rating Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="8dp">
 
-            <Button
-                android:id="@+id/btn_buy_ticket"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="#E91E63"
-                android:text="🎬 Mua vé"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
-        </LinearLayout>
+                    <TextView
+                        android:id="@+id/tv_format"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2D"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:background="@color/purple_cinestar"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_age_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="T18"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:background="@color/primary_pink"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:paddingTop="4dp"
+                        android:paddingBottom="4dp" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <!-- Play Trailer Button -->
+                    <ImageButton
+                        android:id="@+id/btn_watch_trailer"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/circle_button_purple"
+                        android:src="@drawable/ic_play"
+                        android:contentDescription="Xem trailer" />
+
+                </LinearLayout>
+
+                <!-- Director -->
+                <TextView
+                    android:id="@+id/tv_director"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Đạo diễn: "
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
+
+                <!-- Cast -->
+                <TextView
+                    android:id="@+id/tv_cast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Diễn viên: "
+                    android:textColor="#D4C4EB"
+                    android:textSize="13sp" />
+
+                <!-- Description -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Mô tả phim"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_detail_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Đang tải nội dung..."
+                    android:textColor="#D4C4EB"
+                    android:lineSpacingExtra="4dp"
+                    android:textSize="14sp" />
+
+                <!-- Buy Ticket Button -->
+                <Button
+                    android:id="@+id/btn_buy_ticket"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="16dp"
+                    android:backgroundTint="@color/primary_pink"
+                    android:text="🎬 Mua vé"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 </ScrollView>

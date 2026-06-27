@@ -5,11 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.apptvxemphim"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.apptvxemphim"
@@ -31,8 +27,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -57,4 +59,6 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("androidx.viewpager2:viewpager2:1.1.0")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 }
