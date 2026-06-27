@@ -28,6 +28,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
     private String selectedDate = "";
     private String selectedBrand = "ALL";
     private long movieDuration = 0;
+    private String movieFormat = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,8 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
                         tvMovieTitle.setText("Lịch chiếu " + (title != null ? title : ""));
                         Long dur = doc.getLong("duration");
                         if (dur != null) movieDuration = dur;
+                        String fmt = doc.getString("format");
+                        if (fmt != null) movieFormat = fmt;
                     }
                 });
     }
@@ -206,7 +209,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
         layoutDateContainer.removeAllViews();
 
         SimpleDateFormat inFmt  = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        SimpleDateFormat dayFmt = new SimpleDateFormat("dd", Locale.getDefault());
+        SimpleDateFormat dayFmt = new SimpleDateFormat("dd/MM", Locale.getDefault());
         SimpleDateFormat dowFmt = new SimpleDateFormat("EEE", new Locale("vi", "VN"));
 
         for (int i = 0; i < availableDates.size(); i++) {
@@ -233,7 +236,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
 
             tvNum.setTextColor(Color.parseColor("#333333"));
             tvNum.setTypeface(null, android.graphics.Typeface.BOLD);
-            tvNum.setTextSize(16);
+            tvNum.setTextSize(13);
             tvTxt.setTextColor(Color.parseColor("#888888"));
             tvTxt.setTextSize(10);
             tvNum.setGravity(android.view.Gravity.CENTER);
@@ -389,16 +392,17 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
 
         for (Map.Entry<String, List<Showtime>> le : byLang.entrySet()) {
             TextView tvLang = new TextView(this);
-            tvLang.setText("2D " + le.getKey());
+            String prefix = (movieFormat != null && !movieFormat.isEmpty()) ? movieFormat + " " : "";
+            tvLang.setText(prefix + le.getKey());
             tvLang.setTextColor(Color.parseColor("#111111"));
             tvLang.setTypeface(null, android.graphics.Typeface.BOLD);
             tvLang.setPadding(0, dp(10), 0, dp(8));
 
 
-            LinearLayout row = new LinearLayout(this);
-            row.setOrientation(LinearLayout.HORIZONTAL);
+            com.google.android.flexbox.FlexboxLayout row = new com.google.android.flexbox.FlexboxLayout(this);
+            row.setFlexWrap(com.google.android.flexbox.FlexWrap.WRAP);
             LinearLayout.LayoutParams rowLp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             rowLp.bottomMargin = dp(8);
             row.setLayoutParams(rowLp);
 

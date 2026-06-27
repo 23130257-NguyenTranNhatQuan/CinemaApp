@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    android:padding="12dp">
+
+    <!-- Ảnh rạp bên trái -->
+    <ImageView
+        android:id="@+id/iv_cinema_photo"
+        android:layout_width="110dp"
+        android:layout_height="80dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="centerCrop" />
+
+    <!-- Thông tin bên phải -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_cinema_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#111111"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="4dp"
+                android:layout_gravity="top"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/ic_location"
+                android:tint="#E91E63" />
+
+            <TextView
+                android:id="@+id/tv_cinema_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#555555"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginEnd="4dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_phone"
+                android:tint="#555555" />
+
+            <TextView
+                android:id="@+id/tv_cinema_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#555555"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Divider dưới cùng (dùng background trên parent hoặc divider riêng) -->
+</LinearLayout>
