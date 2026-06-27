@@ -56,4 +56,26 @@ public class Hall {
         }
         return map;
     }
+
+    //Thêm hàm fromDocument() để dùng chung, tránh lặp code parse Firestore ở nhiều Activity
+    public static Hall fromDocument(com.google.firebase.firestore.DocumentSnapshot doc) {
+        Hall hall = new Hall();
+        hall.hallId = doc.getId();
+        hall.cinemaId = doc.getString("cinemaId");
+        hall.name = doc.getString("name");
+        hall.rows = doc.getLong("rows") != null ? doc.getLong("rows").intValue() : 8;
+        hall.cols = doc.getLong("cols") != null ? doc.getLong("cols").intValue() : 10;
+        hall.vipRows = doc.getLong("vipRows") != null ? doc.getLong("vipRows").intValue() : 0;
+        hall.coupleRows = doc.getLong("coupleRows") != null ? doc.getLong("coupleRows").intValue() : 0;
+
+        Object czObj = doc.get("centerZone");
+        if (czObj instanceof java.util.Map) {
+            java.util.Map<String, Object> cz = (java.util.Map<String, Object>) czObj;
+            if (cz.get("startRow") != null) hall.centerStartRow = ((Long) cz.get("startRow")).intValue();
+            if (cz.get("endRow") != null) hall.centerEndRow = ((Long) cz.get("endRow")).intValue();
+            if (cz.get("startCol") != null) hall.centerStartCol = ((Long) cz.get("startCol")).intValue();
+            if (cz.get("endCol") != null) hall.centerEndCol = ((Long) cz.get("endCol")).intValue();
+        }
+        return hall;
+    }
 }
