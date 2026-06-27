@@ -294,8 +294,8 @@ public class CinemaShowtimeActivity extends AppCompatActivity {
             tvLang.setLayoutParams(langLp);
             card.addView(tvLang);
 
-            LinearLayout timeRow = new LinearLayout(this);
-            timeRow.setOrientation(LinearLayout.HORIZONTAL);
+            com.google.android.flexbox.FlexboxLayout timeRow = new com.google.android.flexbox.FlexboxLayout(this);
+            timeRow.setFlexWrap(com.google.android.flexbox.FlexWrap.WRAP);
             LinearLayout.LayoutParams timeRowLp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             timeRowLp.bottomMargin = dp(6);
@@ -328,6 +328,7 @@ public class CinemaShowtimeActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 btnLp.setMarginEnd(dp(8));
+                btnLp.bottomMargin = dp(8);
                 tvTime.setLayoutParams(btnLp);
 
                 final String stId = st.getShowtimeId();

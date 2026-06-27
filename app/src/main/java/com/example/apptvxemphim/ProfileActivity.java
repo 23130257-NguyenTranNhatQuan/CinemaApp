@@ -52,7 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (id == R.id.nav_ticket) {
-                Toast.makeText(this, "Chuyển sang Mua vé", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProfileActivity.this, CinemaListActivity.class));
                 return true;
             } else if (id == R.id.nav_news) {
                 Toast.makeText(this, "Chuyển sang Tin tức", Toast.LENGTH_SHORT).show();
