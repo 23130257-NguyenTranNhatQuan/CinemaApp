@@ -1,16 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
 
-    <WebView
-        android:id="@+id/webViewPayment"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        android:elevation="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="THANH TOÁN"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#000"/>
+    </androidx.appcompat.widget.Toolbar>
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_below="@id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:max="100"/>
+
+    <WebView
+        android:id="@+id/webViewPayment"
+        android:layout_below="@id/progressBar"
+        android:layout_above="@id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:id="@+id/bottomLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
+        android:padding="12dp"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnReload"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Làm mới"/>
+
+        <Space
+            android:layout_width="12dp"
+            android:layout_height="1dp"/>
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Hủy"
+            android:backgroundTint="#E91E63"
+            android:textColor="#FFF"/>
+
+    </LinearLayout>
+
 </RelativeLayout>

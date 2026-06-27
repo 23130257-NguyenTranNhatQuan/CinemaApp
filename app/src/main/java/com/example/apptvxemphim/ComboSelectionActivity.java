@@ -7,11 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,9 +21,8 @@ public class ComboSelectionActivity extends AppCompatActivity implements ComboAd
     private TextView tvTotalPrice;
     private Button btnNext;
 
-    // Khai báo công cụ kết nối Firebase Realtime Database
-    private FirebaseDatabase database;
-    private DatabaseReference combosRef;
+    // ĐÃ SỬA: Thay thế DatabaseReference bằng Firestore
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +33,11 @@ public class ComboSelectionActivity extends AppCompatActivity implements ComboAd
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         btnNext = findViewById(R.id.btnNextToCheckout);
 
-        // Thiết lập Adapter và LayoutManager ban đầu
         adapter = new ComboAdapter(allItems, this);
         rvCombos.setLayoutManager(new LinearLayoutManager(this));
         rvCombos.setAdapter(adapter);
 
-        // Khởi tạo kết nối Firebase và lấy dữ liệu online
+        // Giữ nguyên lời gọi hàm, chỉ sửa nội dung bên trong hàm này
         initFirebaseConnection();
 
         btnNext.setOnClickListener(v -> {
@@ -57,55 +52,46 @@ public class ComboSelectionActivity extends AppCompatActivity implements ComboAd
 
             Intent intent = new Intent(this, CheckoutActivity.class);
             intent.putParcelableArrayListExtra("selected_combos", selectedCombos);
-
-            // 1. Nhận các thông tin cơ bản
+            intent.putExtra("COMBO_PRICE", comboPriceTotal);
             intent.putExtra("MOVIE_TITLE", getIntent().getStringExtra("MOVIE_TITLE"));
-            intent.putStringArrayListExtra("SELECTED_SEATS", getIntent().getStringArrayListExtra("SELECTED_SEATS"));
+            intent.putExtra("SHOWTIME_ID", getIntent().getStringExtra("SHOWTIME_ID"));
+            intent.putExtra("SHOWTIME_TIME", getIntent().getStringExtra("SHOWTIME_TIME"));
+            intent.putExtra("SHOWTIME_DATE", getIntent().getStringExtra("SHOWTIME_DATE"));
+            intent.putExtra("SHOWTIME_LANG", getIntent().getStringExtra("SHOWTIME_LANG"));
+            intent.putExtra("HALL_ID", getIntent().getStringExtra("HALL_ID"));
 
-            // 2. CƠ CHẾ TỰ BẮT KEY: Kiểm tra xem khóa nào chứa giá trị tiền từ các màn hình trước
-            long seatPrice = getIntent().getLongExtra("TOTAL_SEAT_PRICE", 0);
+            ArrayList<String> seats = getIntent().getStringArrayListExtra("SELECTED_SEATS");
+            intent.putStringArrayListExtra("SELECTED_SEATS", seats);
+
+            long seatPrice = getIntent().getLongExtra("SEAT_TOTAL", 0);
             if (seatPrice == 0) seatPrice = getIntent().getLongExtra("SEAT_PRICE", 0);
-
             if (seatPrice == 0) {
                 String priceStr = getIntent().getStringExtra("TOTAL_PRICE");
                 if (priceStr != null) {
                     try {
                         priceStr = priceStr.replaceAll("[^0-9]", "");
                         seatPrice = Long.parseLong(priceStr);
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) { e.printStackTrace(); }
                 }
             }
-
             intent.putExtra("SEAT_PRICE", seatPrice);
-            intent.putExtra("COMBO_PRICE", comboPriceTotal);
-
             startActivity(intent);
         });
     }
 
+    // ĐÃ SỬA: Phương thức kết nối Firestore
     private void initFirebaseConnection() {
-        database = FirebaseDatabase.getInstance();
-        // Trỏ thẳng vào node "combos" đã tạo trên console
-        combosRef = database.getReference("combos");
+        db = FirebaseFirestore.getInstance();
 
-        // Lắng nghe sự thay đổi dữ liệu thời gian thực
-        combosRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    Toast.makeText(ComboSelectionActivity.this, "Không tìm thấy dữ liệu bắp nước!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // Dùng Map để nhóm các item theo danh mục (Category) tự động
+        // Lấy toàn bộ document trong collection "combos"
+        db.collection("combos").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult() != null) {
                 Map<String, List<Combo>> groupedMap = new LinkedHashMap<>();
 
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Combo combo = dataSnapshot.getValue(Combo.class);
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    Combo combo = document.toObject(Combo.class);
                     if (combo != null) {
-                        // Lấy tên danh mục, nếu trống thì xếp vào mục "KHÁC"
-                        String category = combo.category != null ? combo.category.toUpperCase() : "KHÁC";
-
+                        String category = (combo.category != null) ? combo.category.toUpperCase() : "KHÁC";
                         if (!groupedMap.containsKey(category)) {
                             groupedMap.put(category, new ArrayList<>());
                         }
@@ -113,25 +99,16 @@ public class ComboSelectionActivity extends AppCompatActivity implements ComboAd
                     }
                 }
 
-                // Làm sạch danh sách cũ để đổ dữ liệu mới
                 allItems.clear();
-
-                // Đổ dữ liệu đã gom nhóm vào cấu trúc hiển thị kèm Header
                 for (Map.Entry<String, List<Combo>> entry : groupedMap.entrySet()) {
-                    // Thêm phần tiêu đề phân loại (Header)
                     allItems.add(Combo.createHeader(entry.getKey()));
-                    // Thêm danh sách các gói bắp nước thuộc phân loại đó
                     allItems.addAll(entry.getValue());
                 }
 
-                // Cập nhật lại giao diện hiển thị
                 adapter.notifyDataSetChanged();
                 updateTotalPrice();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ComboSelectionActivity.this, "Lỗi kết nối Firebase: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(ComboSelectionActivity.this, "Lỗi tải dữ liệu từ Firestore!", Toast.LENGTH_SHORT).show();
             }
         });
     }

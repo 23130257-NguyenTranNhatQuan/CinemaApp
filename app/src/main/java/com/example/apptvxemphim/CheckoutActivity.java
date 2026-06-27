@@ -1,6 +1,7 @@
 package com.example.apptvxemphim;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -11,6 +12,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 
 public class CheckoutActivity extends AppCompatActivity {
@@ -18,7 +20,8 @@ public class CheckoutActivity extends AppCompatActivity {
     private ScrollView mainScrollView;
     private TextView tvFinalTotal, tvMovieName, tvSeats, tvTimer;
     private EditText etPromoCode;
-    private RadioGroup rgPaymentMethod;
+    // Đã thay thế RadioGroup bằng 3 RadioButton độc lập
+    private RadioButton rbMomo, rbATM, rbVisa;
     private WebView webView;
     private long totalAmount = 0;
     private CountDownTimer countDownTimer;
@@ -41,12 +44,68 @@ public class CheckoutActivity extends AppCompatActivity {
         tvMovieName = findViewById(R.id.tvCheckoutMovieName);
         tvSeats = findViewById(R.id.tvCheckoutSeats);
         etPromoCode = findViewById(R.id.etPromoCode);
-        rgPaymentMethod = findViewById(R.id.rgPaymentMethod);
         mainScrollView = findViewById(R.id.mainScrollView);
         paymentContainer = findViewById(R.id.paymentContainer);
         webView = findViewById(R.id.webViewPayment);
         tvTimer = findViewById(R.id.tvTimer);
+
+        // Khởi tạo các RadioButton từ XML
+        rbMomo = findViewById(R.id.rbMomo);
+        rbATM = findViewById(R.id.rbATM);
+        rbVisa = findViewById(R.id.rbVisa);
+
+        // Logic chọn 1 bỏ các cái còn lại
+        View.OnClickListener radioListener = v -> {
+            rbMomo.setChecked(v.getId() == R.id.rbMomo);
+            rbATM.setChecked(v.getId() == R.id.rbATM);
+            rbVisa.setChecked(v.getId() == R.id.rbVisa);
+        };
+        rbMomo.setOnClickListener(radioListener);
+        rbATM.setOnClickListener(radioListener);
+        rbVisa.setOnClickListener(radioListener);
     }
+
+    private void setupListeners() {
+        findViewById(R.id.btnPayNow).setOnClickListener(v -> {
+            // Thay vì kiểm tra RadioGroup, ta kiểm tra trực tiếp các RadioButton
+            if (!rbMomo.isChecked() && !rbATM.isChecked() && !rbVisa.isChecked()) {
+                Toast.makeText(this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            mainScrollView.setVisibility(View.GONE);
+            paymentContainer.setVisibility(View.GONE);
+            tvTimer.setVisibility(View.GONE);
+            webView.setVisibility(View.VISIBLE);
+
+            WebSettings settings = webView.getSettings();
+            settings.setJavaScriptEnabled(true);
+            settings.setAllowFileAccess(true);
+
+            webView.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    super.onPageFinished(view, url);
+                    webView.evaluateJavascript("if(document.getElementById('orderId')) { document.getElementById('orderId').innerText = '" + currentOrderId + "'; }", null);
+                    String formattedPrice = String.format("%,d đ", totalAmount);
+                    webView.evaluateJavascript("if(document.getElementById('amount')) { document.getElementById('amount').innerText = '" + formattedPrice + "'; }", null);
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                    return handlePaymentRedirection(request.getUrl().toString());
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    return handlePaymentRedirection(url);
+                }
+            });
+            webView.loadUrl("file:///android_asset/payment.html");
+        });
+    }
+
+    // --- CÁC HÀM CŨ CỦA BẠN (GIỮ NGUYÊN ĐỂ ĐẢM BẢO ĐỦ CODE) ---
 
     private void startPaymentTimer() {
         if (countDownTimer != null) countDownTimer.cancel();
@@ -87,72 +146,14 @@ public class CheckoutActivity extends AppCompatActivity {
         }
         totalAmount = seatPrice + comboTotal;
         updateTotalDisplay();
-
-        // Khởi tạo sẵn mã đơn hàng duy nhất cho lượt thanh toán này
         currentOrderId = "CS" + System.currentTimeMillis();
-    }
-
-    private void setupListeners() {
-        findViewById(R.id.btnPayNow).setOnClickListener(v -> {
-            if (rgPaymentMethod != null && rgPaymentMethod.getCheckedRadioButtonId() == -1) {
-                Toast.makeText(this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            mainScrollView.setVisibility(View.GONE);
-            paymentContainer.setVisibility(View.GONE);
-            tvTimer.setVisibility(View.GONE);
-            webView.setVisibility(View.VISIBLE);
-
-            WebSettings settings = webView.getSettings();
-            settings.setJavaScriptEnabled(true);
-            settings.setAllowFileAccess(true);
-
-            webView.setWebViewClient(new WebViewClient() {
-                @Override
-                public void onPageFinished(WebView view, String url) {
-                    super.onPageFinished(view, url);
-
-                    // Đổ mã đơn hàng vào HTML
-                    webView.evaluateJavascript("if(document.getElementById('orderId')) { document.getElementById('orderId').innerText = '" + currentOrderId + "'; }", null);
-
-                    // Đổ tổng tiền đã định dạng vào HTML
-                    String formattedPrice = String.format("%,d đ", totalAmount);
-                    webView.evaluateJavascript("if(document.getElementById('amount')) { document.getElementById('amount').innerText = '" + formattedPrice + "'; }", null);
-                }
-
-                // Hỗ trợ bắt URL cho các thiết bị Android mới (API 24+)
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                    String url = request.getUrl().toString();
-                    if (handlePaymentRedirection(url)) {
-                        return true;
-                    }
-                    return super.shouldOverrideUrlLoading(view, request);
-                }
-
-                // Hỗ trợ bắt URL cho các thiết bị Android cũ (API < 24)
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    if (handlePaymentRedirection(url)) {
-                        return true;
-                    }
-                    return super.shouldOverrideUrlLoading(view, url);
-                }
-            });
-
-            webView.loadUrl("file:///android_asset/payment.html");
-        });
     }
 
     private boolean handlePaymentRedirection(String url) {
         if (url.contains("payment_success")) {
             if (countDownTimer != null) countDownTimer.cancel();
-
-            // Mở ứng dụng Email để người dùng gửi xác nhận (Mục đích demo học tập)
-            sendEmailConfirmation("Mã đơn: " + currentOrderId + " - Tổng tiền: " + String.format("%,d đ", totalAmount));
-
-            // Truyền trạng thái thành công sang màn hình kết quả
+            updateSeatsToBooked(getIntent().getStringExtra("SHOWTIME_ID"), getIntent().getStringArrayListExtra("SELECTED_SEATS"));
+            sendEmailConfirmation("Mã đơn: " + currentOrderId);
             Intent intent = new Intent(CheckoutActivity.this, PaymentResultActivity.class);
             intent.putExtra("IS_SUCCESS", true);
             startActivity(intent);
@@ -165,13 +166,9 @@ public class CheckoutActivity extends AppCompatActivity {
     private void sendEmailConfirmation(String orderInfo) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("message/rfc822");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Xác nhận đặt vé thành công - CINESTAR");
-        intent.putExtra(Intent.EXTRA_TEXT, "Chúc mừng bạn đã đặt vé thành công!\nThông tin đơn hàng: " + orderInfo);
-        try {
-            startActivity(Intent.createChooser(intent, "Gửi xác nhận qua..."));
-        } catch (Exception e) {
-            Toast.makeText(this, "Không tìm thấy ứng dụng email", Toast.LENGTH_SHORT).show();
-        }
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Xác nhận đặt vé thành công");
+        intent.putExtra(Intent.EXTRA_TEXT, "Thông tin đơn hàng: " + orderInfo);
+        try { startActivity(Intent.createChooser(intent, "Gửi xác nhận qua...")); } catch (Exception e) {}
     }
 
     private void addOrderItem(String name, long price) {
@@ -182,22 +179,21 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void updateTotalDisplay() {
-        if (tvFinalTotal != null) {
-            tvFinalTotal.setText(String.format("%,d đ", totalAmount));
-        }
+        if (tvFinalTotal != null) tvFinalTotal.setText(String.format("%,d đ", totalAmount));
     }
 
     @Override
     protected void onDestroy() {
-
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
-
-        if (webView != null) {
-            webView.destroy();
-        }
-
+        if (countDownTimer != null) countDownTimer.cancel();
+        if (webView != null) webView.destroy();
         super.onDestroy();
+    }
+
+    private void updateSeatsToBooked(String showtimeId, ArrayList<String> selectedSeats) {
+        if (showtimeId == null || selectedSeats == null) return;
+        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        for (String seatId : selectedSeats) updates.put(seatId, true);
+        db.collection("BookedSeats").document(showtimeId).set(updates, com.google.firebase.firestore.SetOptions.merge());
     }
 }

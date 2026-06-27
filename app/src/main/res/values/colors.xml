@@ -15,4 +15,8 @@
     <color name="purple_light">#7B4B94</color>
     <color name="purple_dark">#2D1B4E</color>
     <color name="yellow">#FFD700</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+
+    <color name="background_color">#F5F5F5</color>
 </resources>

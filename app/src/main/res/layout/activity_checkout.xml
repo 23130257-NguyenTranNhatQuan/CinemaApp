@@ -1,156 +1,343 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
+
     android:layout_height="match_parent"
+
     android:background="#F5F5F5">
 
+
+
     <androidx.appcompat.widget.Toolbar
+
         android:id="@+id/toolbar"
+
         android:layout_width="match_parent"
+
         android:layout_height="?attr/actionBarSize"
+
         android:background="#FFFFFF"
+
         android:elevation="4dp">
+
         <TextView
+
             android:layout_width="wrap_content"
+
             android:layout_height="wrap_content"
+
             android:layout_gravity="center"
+
             android:text="THANH TOÁN"
+
             android:textColor="#000000"
+
             android:textSize="18sp"
+
             android:textStyle="bold" />
+
     </androidx.appcompat.widget.Toolbar>
 
+
+
     <TextView
+
         android:id="@+id/tvTimer"
+
         android:layout_width="match_parent"
+
         android:layout_height="wrap_content"
+
         android:layout_below="@id/toolbar"
+
         android:background="#FFEBEE"
+
         android:gravity="center"
+
         android:padding="8dp"
+
         android:text="Thời gian giữ vé: 05:00"
+
         android:textColor="#E91E63"
+
         android:textStyle="bold" />
 
+
+
     <ScrollView
+
         android:id="@+id/mainScrollView"
+
         android:layout_width="match_parent"
+
         android:layout_height="match_parent"
+
         android:layout_above="@+id/paymentContainer"
+
         android:layout_below="@+id/tvTimer"
+
         android:fillViewport="true">
 
+
+
         <LinearLayout
+
             android:layout_width="match_parent"
+
             android:layout_height="wrap_content"
+
             android:orientation="vertical"
+
             android:padding="16dp">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <TextView android:id="@+id/tvCheckoutMovieName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="16sp" android:textColor="#333"/>
-                    <TextView android:id="@+id/tvCheckoutSeats" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="#666"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+
 
             <androidx.cardview.widget.CardView
+
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
+
                 app:cardCornerRadius="12dp"
+
                 android:layout_marginBottom="16dp"
+
                 app:cardElevation="2dp">
+
                 <LinearLayout
-                    android:id="@+id/layoutOrderDetails"
+
                     android:layout_width="match_parent"
+
                     android:layout_height="wrap_content"
+
                     android:orientation="vertical"
+
                     android:padding="16dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="CHI TIẾT ĐƠN HÀNG" android:textStyle="bold" android:layout_marginBottom="8dp" android:textColor="#000"/>
+
+                    <TextView android:id="@+id/tvCheckoutMovieName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="16sp" android:textColor="#333"/>
+
+                    <TextView android:id="@+id/tvCheckoutSeats" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="#666"/>
+
                 </LinearLayout>
+
             </androidx.cardview.widget.CardView>
+
+
+
+            <androidx.cardview.widget.CardView
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                app:cardCornerRadius="12dp"
+
+                android:layout_marginBottom="16dp"
+
+                app:cardElevation="2dp">
+
+                <LinearLayout
+
+                    android:id="@+id/layoutOrderDetails"
+
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+
+                    android:orientation="vertical"
+
+                    android:padding="16dp">
+
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="CHI TIẾT ĐƠN HÀNG" android:textStyle="bold" android:layout_marginBottom="8dp" android:textColor="#000"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
 
             <LinearLayout
+
                 android:layout_width="match_parent"
+
                 android:layout_height="wrap_content"
+
                 android:orientation="horizontal"
+
                 android:gravity="center_vertical">
+
                 <EditText
+
                     android:id="@+id/etPromoCode"
+
                     android:layout_width="0dp"
+
                     android:layout_height="50dp"
+
                     android:layout_weight="1"
+
                     android:hint="Nhập mã khuyến mãi"
+
                     android:paddingHorizontal="16dp"
+
                     android:background="@android:drawable/edit_text"/>
+
                 <Button
+
                     android:id="@+id/btnApplyPromo"
+
                     android:layout_width="wrap_content"
+
                     android:layout_height="50dp"
+
                     android:layout_marginStart="8dp"
+
                     android:text="Áp dụng"
+
                     android:backgroundTint="#E91E63"
+
                     android:textColor="#FFFFFF"/>
+
             </LinearLayout>
+
         </LinearLayout>
+
     </ScrollView>
 
+
+
     <LinearLayout
+
         android:id="@+id/paymentContainer"
+
         android:layout_width="match_parent"
+
         android:layout_height="wrap_content"
+
         android:layout_alignParentBottom="true"
+
         android:background="#FFFFFF"
+
         android:orientation="vertical"
+
         android:padding="20dp"
+
         android:elevation="20dp">
+
+
 
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="PHƯƠNG THỨC THANH TOÁN" android:textStyle="bold" android:layout_marginBottom="12dp"/>
 
-        <RadioGroup
-            android:id="@+id/rgPaymentMethod"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
-            <RadioButton android:id="@+id/rbMomo" android:layout_width="match_parent" android:layout_height="wrap_content" android:text=" Ví MoMo" android:checked="true" android:padding="10dp"/>
-            <RadioButton android:id="@+id/rbATM" android:layout_width="match_parent" android:layout_height="wrap_content" android:text=" OnePay - ATM Nội địa" android:padding="10dp"/>
-            <RadioButton android:id="@+id/rbVisa" android:layout_width="match_parent" android:layout_height="wrap_content" android:text=" VISA, MASTER, JCB" android:padding="10dp"/>
-        </RadioGroup>
+
 
         <LinearLayout
+
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical" android:gravity="center_vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tổng cộng:" android:textSize="12sp" />
-                <TextView android:id="@+id/tvFinalTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 đ" android:textSize="20sp" android:textStyle="bold" android:textColor="#E91E63" />
-            </LinearLayout>
-            <Button
-                android:id="@+id/btnPayNow"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:text="THANH TOÁN"
-                android:backgroundTint="#E91E63"
-                android:textColor="#FFFFFF"
-                android:paddingHorizontal="24dp"/>
+
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:layout_marginBottom="16dp">
+
+
+
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="10dp" android:background="?attr/selectableItemBackground">
+
+                <ImageView android:id="@+id/ivMomo" android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/ic_momo" android:layout_centerVertical="true"/>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ví MoMo" android:layout_toEndOf="@id/ivMomo" android:layout_centerVertical="true" android:layout_marginStart="12dp"/>
+
+                <RadioButton android:id="@+id/rbMomo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:checked="true" android:buttonTint="#E91E63"/>
+
+            </RelativeLayout>
+
+
+
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="10dp" android:background="?attr/selectableItemBackground">
+
+                <ImageView android:id="@+id/ivATM" android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/ic_atm" android:layout_centerVertical="true"/>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="OnePay - ATM Nội địa" android:layout_toEndOf="@id/ivATM" android:layout_centerVertical="true" android:layout_marginStart="12dp"/>
+
+                <RadioButton android:id="@+id/rbATM" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:buttonTint="#E91E63"/>
+
+            </RelativeLayout>
+
+
+
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="10dp" android:background="?attr/selectableItemBackground">
+
+                <ImageView android:id="@+id/ivVisa" android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/ic_visa" android:layout_centerVertical="true"/>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="VISA, MASTER, JCB" android:layout_toEndOf="@id/ivVisa" android:layout_centerVertical="true" android:layout_marginStart="12dp"/>
+
+                <RadioButton android:id="@+id/rbVisa" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:buttonTint="#E91E63"/>
+
+            </RelativeLayout>
+
         </LinearLayout>
+
+
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal"
+
+            android:gravity="center_vertical">
+
+            <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:orientation="vertical">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tổng cộng:" android:textSize="12sp" />
+
+                <TextView android:id="@+id/tvFinalTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 đ" android:textSize="20sp" android:textStyle="bold" android:textColor="#E91E63" />
+
+            </LinearLayout>
+
+            <Button
+
+                android:id="@+id/btnPayNow"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="50dp"
+
+                android:text="THANH TOÁN"
+
+                android:backgroundTint="#E91E63"
+
+                android:textColor="#FFFFFF"
+
+                android:paddingHorizontal="24dp"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
+
+
     <WebView
+
         android:id="@+id/webViewPayment"
+
         android:layout_width="match_parent"
+
         android:layout_height="match_parent"
+
         android:layout_below="@+id/toolbar"
+
         android:visibility="gone" />
 
+
+
 </RelativeLayout>
+
+
+
