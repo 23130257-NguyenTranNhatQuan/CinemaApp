@@ -7,6 +7,9 @@ public class Cinema {
     private String address;
     private String logo;
     private String brand;
+    private String phone;
+    private String photo;
+
     public Cinema() {}
 
     public String getCinemaId() { return cinemaId; }
@@ -20,5 +23,10 @@ public class Cinema {
     public void setLogo(String v) { logo = v; }
     public String getBrand() { return brand; }
     public void setBrand(String v) { brand = v; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String v) { phone = v; }
+    public String getPhoto() { return photo; }
+    public void setPhoto(String v) { photo = v; }
 
 }

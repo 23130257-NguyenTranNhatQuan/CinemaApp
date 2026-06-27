@@ -70,6 +70,8 @@
         <activity android:name=".ManageHallsActivity" />
         <activity android:name=".HallCreateActivity" />
         <activity android:name=".HallEditActivity" />
+        <activity android:name=".CinemaListActivity" />
+        <activity android:name=".CinemaShowtimeActivity" />
     </application>
 
 </manifest>
