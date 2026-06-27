@@ -98,6 +98,31 @@
                     android:padding="6dp">
 
                     <Button
+                        android:id="@+id/btnAdminDashboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:backgroundTint="#4A2B73"
+                        android:gravity="start|center_vertical"
+                        android:paddingStart="16dp"
+                        android:text="🔧   Quản trị hệ thống"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:elevation="0dp"
+                        app:cornerRadius="8dp"/>
+
+                    <View
+                        android:id="@+id/dividerAdmin"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#EFEFEF"
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="6dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:visibility="gone"/>
+                    <Button
                         android:id="@+id/btnViewHistory"
                         android:layout_width="match_parent"
                         android:layout_height="54dp"

@@ -287,22 +287,26 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < placeholderImages.length; i++) {
             News news = new News();
 
-            // SỬA TẠI ĐÂY: Gán trực tiếp vào thuộc tính public title và imageUrl của bạn
-            news.title = names[i];
-            news.imageUrl = placeholderImages[i]; // (Nếu dòng dưới của bạn kia bị lỗi poster)
+            news.setTitle(names[i]);
+            news.setImageUrl(placeholderImages[i]);
 
             newsList.add(news);
         }
         newsAdapter.notifyDataSetChanged();
     }
+
     private void loadBannersFromFirebase() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("Banner").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 bannerList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    Banner banner = document.toObject(Banner.class);
-                    bannerList.add(banner);
+                    try {
+                        Banner banner = document.toObject(Banner.class);
+                        bannerList.add(banner);
+                    } catch (Exception e) {
+                        Log.e("FirebaseTest", "Banner loi: " + e.getMessage());
+                    }
                 }
                 Collections.sort(bannerList, (b1, b2) -> Integer.compare(b1.getOrder(), b2.getOrder()));
                 totalBanners = bannerList.size();
@@ -348,7 +352,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showBanner(int position) {
-        // Fade out all banners
         for (ImageView banner : bannerImages) {
             if (banner.getVisibility() == View.VISIBLE) {
                 AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
@@ -358,11 +361,9 @@ public class MainActivity extends AppCompatActivity {
             }
             banner.setVisibility(View.GONE);
         }
-        // Fade in the new active banner
         if (position < bannerImages.length && position < totalBanners && position >= 0) {
             ImageView activeBanner = bannerImages[position];
             activeBanner.setVisibility(View.VISIBLE);
-
             AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
             fadeIn.setDuration(500);
             fadeIn.setFillAfter(true);
@@ -419,3 +420,4 @@ public class MainActivity extends AppCompatActivity {
         startAutoSlide();
     }
 }
+
