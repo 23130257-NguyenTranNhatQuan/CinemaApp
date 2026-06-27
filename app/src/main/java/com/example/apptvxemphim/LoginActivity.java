@@ -29,6 +29,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvRegisterNow;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
+
+    private TextView tvForgotPassword;
     private static final int RC_SIGN_IN = 9001;
 
     @Override
@@ -43,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
         tvRegisterNow = findViewById(R.id.tvRegisterNow);
-
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("590586581626-9o7cfvvnchjkvbth7pn23e201f3a6f2l.apps.googleusercontent.com")
                 .requestEmail()
@@ -108,12 +110,23 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         tvRegisterNow.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
+
             }
         });
+        if (tvForgotPassword != null) {
+            tvForgotPassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }
     }
 
     @Override
