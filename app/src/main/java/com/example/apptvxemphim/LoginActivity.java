@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -40,16 +41,26 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
+                // Tiến hành đăng nhập bằng Firebase Auth
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                startActivity(intent);
-                                finish();
+                                FirebaseUser user = mAuth.getCurrentUser();
+
+                                // KIỂM TRA XEM EMAIL ĐÃ ĐƯỢC XÁC THỰC CHƯA
+                                if (user != null && user.isEmailVerified()) {
+                                    Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    // Nếu chưa xác thực -> Thông báo và kích văng ra ngoài
+                                    Toast.makeText(LoginActivity.this, "Vui lòng vào hộp thư Email để xác thực tài khoản trước khi đăng nhập!", Toast.LENGTH_LONG).show();
+                                    mAuth.signOut();
+                                }
                             } else {
                                 String error = task.getException() != null ? task.getException().getMessage() : "Lỗi";
-                                Toast.makeText(LoginActivity.this, "Lỗi: " + error, Toast.LENGTH_LONG).show();
+                                Toast.makeText(LoginActivity.this, "Lỗi đăng nhập: " + error, Toast.LENGTH_LONG).show();
                             }
                         });
             }
