@@ -39,7 +39,7 @@ public class ManageMoviesActivity extends AppCompatActivity {
 
         rcvMovies = findViewById(R.id.rcv_admin_movies);
         movieList = new ArrayList<>();
-        adapter = new AdminMovieAdapter(movieList);
+        adapter = new AdminMovieAdapter(movieList, isShowingNowShowing ? "Movie" : "ComingMovie");
         rcvMovies.setLayoutManager(new LinearLayoutManager(this));
         rcvMovies.setAdapter(adapter);
 
@@ -64,6 +64,7 @@ public class ManageMoviesActivity extends AppCompatActivity {
         FloatingActionButton fabAdd = findViewById(R.id.fab_add_movie);
         fabAdd.setOnClickListener(v -> {
             Intent intent = new Intent(ManageMoviesActivity.this, AddEditMovieActivity.class);
+            intent.putExtra("MOVIE_TYPE", isShowingNowShowing ? "Movie" : "ComingMovie");
             startActivity(intent);
         });
     }
@@ -84,6 +85,10 @@ public class ManageMoviesActivity extends AppCompatActivity {
 
     private void loadMovies() {
         String collection = isShowingNowShowing ? "Movie" : "ComingMovie";
+        // Update adapter with correct movieType before loading
+        adapter = new AdminMovieAdapter(movieList, collection);
+        rcvMovies.setAdapter(adapter);
+        
         db.collection(collection).addSnapshotListener((value, error) -> {
             if (error != null) return;
             movieList.clear();

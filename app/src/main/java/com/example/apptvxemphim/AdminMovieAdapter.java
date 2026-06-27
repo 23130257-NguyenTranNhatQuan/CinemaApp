@@ -17,9 +17,11 @@ import java.util.List;
 public class AdminMovieAdapter extends RecyclerView.Adapter<AdminMovieAdapter.ViewHolder> {
 
     private List<Movie> movieList;
+    private String movieType = "Movie"; // "Movie" hoặc "ComingMovie"
 
-    public AdminMovieAdapter(List<Movie> movieList) {
+    public AdminMovieAdapter(List<Movie> movieList, String movieType) {
         this.movieList = movieList;
+        this.movieType = movieType;
     }
 
     @NonNull
@@ -44,6 +46,7 @@ public class AdminMovieAdapter extends RecyclerView.Adapter<AdminMovieAdapter.Vi
         holder.btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), AddEditMovieActivity.class);
             intent.putExtra("MOVIE_ID", movie.getId());
+            intent.putExtra("MOVIE_TYPE", movieType);
             v.getContext().startActivity(intent);
         });
 
@@ -53,7 +56,7 @@ public class AdminMovieAdapter extends RecyclerView.Adapter<AdminMovieAdapter.Vi
                     .setTitle("Xóa phim")
                     .setMessage("Bạn có chắc muốn xóa phim " + movie.getTitle() + " không?")
                     .setPositiveButton("Xóa", (dialog, which) -> {
-                        FirebaseFirestore.getInstance().collection("Movie").document(movie.getId())
+                        FirebaseFirestore.getInstance().collection(movieType).document(movie.getId())
                                 .delete()
                                 .addOnSuccessListener(aVoid -> {
                                     movieList.remove(position);

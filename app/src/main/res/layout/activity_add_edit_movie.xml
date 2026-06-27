@@ -38,7 +38,12 @@
 
         <EditText android:id="@+id/et_movie_genres" android:layout_width="match_parent" android:layout_height="50dp" android:hint="Thể loại (Cách nhau bằng dấu phẩy: Hành động, Hài)" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
 
-        <EditText android:id="@+id/et_movie_description" android:layout_width="match_parent" android:layout_height="120dp" android:hint="Mô tả phim..." android:gravity="top|start" android:inputType="textMultiLine" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="24dp"/>
+        <EditText android:id="@+id/et_movie_description" android:layout_width="match_parent" android:layout_height="120dp" android:hint="Mô tả phim..." android:gravity="top|start" android:inputType="textMultiLine" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:layout_marginBottom="12dp"/>
+        
+        <LinearLayout android:id="@+id/layout_release_date" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="24dp" android:visibility="gone">
+            <EditText android:id="@+id/et_release_date" android:layout_width="0dp" android:layout_weight="1" android:layout_height="50dp" android:hint="Ngày khởi chiếu (dd/MM/yyyy)" android:background="@drawable/bg_spinner_purple" android:textColor="@color/white" android:textColorHint="#D4C4EB" android:padding="12dp" android:focusable="false" android:clickable="true"/>
+            <Button android:id="@+id/btn_pick_date" android:layout_width="wrap_content" android:layout_height="50dp" android:text="Chọn" android:backgroundTint="@color/primary_pink" android:textColor="@color/white" android:layout_marginStart="8dp"/>
+        </LinearLayout>
 
         <Button
             android:id="@+id/btn_save_movie"
