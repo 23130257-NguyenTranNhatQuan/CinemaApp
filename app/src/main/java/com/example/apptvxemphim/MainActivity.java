@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Đang ở Trang chủ", Toast.LENGTH_SHORT).show();
                     return true;
                 } else if (id == R.id.nav_ticket) {
-                    Toast.makeText(MainActivity.this, "Chuyển sang Mua vé", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, CinemaListActivity.class));
                     return true;
                 } else if (id == R.id.nav_news) {
                     Toast.makeText(MainActivity.this, "Chuyển sang Tin tức", Toast.LENGTH_SHORT).show();
