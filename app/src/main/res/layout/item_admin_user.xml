@@ -55,4 +55,34 @@
         android:paddingHorizontal="10dp"
         android:paddingVertical="4dp"
         android:text="Người dùng" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp">
+
+        <Button
+            android:id="@+id/btn_change_role"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đổi role"
+            android:textSize="10sp"
+            android:backgroundTint="@color/primary_pink"
+            android:textColor="@color/white"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp" />
+
+        <Button
+            android:id="@+id/btn_ban_unban"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ban"
+            android:textSize="10sp"
+            android:backgroundTint="@color/red"
+            android:textColor="@color/white"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
 </LinearLayout>

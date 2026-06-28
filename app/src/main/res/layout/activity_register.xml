@@ -34,17 +34,35 @@
         android:inputType="textEmailAddress"
         android:background="@android:drawable/editbox_background"
         android:padding="10dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvEmailError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_marginBottom="12dp"/>
 
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:hint="Nhập Mật khẩu (Từ 6 ký tự)"
+        android:hint="Nhập Mật khẩu (Từ 6 ký tự, có chữ hoa, chữ thường và số)"
         android:inputType="textPassword"
         android:background="@android:drawable/editbox_background"
         android:padding="10dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvPasswordError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_marginBottom="12dp"/>
 
     <EditText
         android:id="@+id/etConfirmPassword"
@@ -54,7 +72,16 @@
         android:inputType="textPassword"
         android:background="@android:drawable/editbox_background"
         android:padding="10dp"
-        android:layout_marginBottom="30dp"/>
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvConfirmPasswordError"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:layout_marginBottom="14dp"/>
 
     <Button
         android:id="@+id/btnRegister"
