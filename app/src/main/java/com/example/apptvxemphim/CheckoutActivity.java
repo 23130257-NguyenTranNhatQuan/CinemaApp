@@ -1,6 +1,7 @@
 package com.example.apptvxemphim;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -16,10 +17,20 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.activation.DataHandler;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.mail.util.ByteArrayDataSource;
+
+import java.util.Properties;
 
 public class CheckoutActivity extends AppCompatActivity {
     private LinearLayout layoutOrderDetails, paymentContainer;
@@ -221,11 +232,61 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void sendEmailConfirmation(String orderInfo) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("message/rfc822");
-        intent.putExtra(Intent.EXTRA_SUBJECT, "Xác nhận đặt vé thành công");
-        intent.putExtra(Intent.EXTRA_TEXT, "Thông tin đơn hàng: " + orderInfo);
-        try { startActivity(Intent.createChooser(intent, "Gửi xác nhận qua...")); } catch (Exception e) {}
+        final String senderEmail = "nhatquanqn2005@gmail.com";
+        final String senderPassword = "kuar cvkz zdmf ddqq";
+        String recipientEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+        new Thread(() -> {
+            try {
+                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                Bitmap bitmap = barcodeEncoder.encodeBitmap(currentOrderId, BarcodeFormat.QR_CODE, 400, 400);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+                byte[] imageBytes = baos.toByteArray();
+
+                Properties props = new Properties();
+                props.put("mail.smtp.auth", "true");
+                props.put("mail.smtp.starttls.enable", "true");
+                props.put("mail.smtp.host", "smtp.gmail.com");
+                props.put("mail.smtp.port", "587");
+
+                Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(senderEmail, senderPassword);
+                    }
+                });
+
+                Message message = new MimeMessage(session);
+                message.setFrom(new InternetAddress(senderEmail));
+                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
+                message.setSubject("Xác nhận đặt vé Cinestar thành công");
+
+                MimeMultipart multipart = new MimeMultipart("related"); // "related" báo cho email biết các thành phần có liên kết với nhau
+
+                MimeBodyPart textPart = new MimeBodyPart();
+                String htmlContent = "<h2>Chào bạn,</h2>" +
+                        "<p>Đơn hàng của bạn đã thanh toán thành công!</p>" +
+                        "<p>Vui lòng xuất trình mã QR dưới đây cho nhân viên tại rạp:</p>" +
+                        "<img src=\"cid:qrcode_image\" style=\"width:250px; height:250px;\" />" +
+                        "<p>Mã đơn hàng: <b>" + currentOrderId + "</b></p>" +
+                        "<p>Cảm ơn bạn đã sử dụng dịch vụ!</p>";
+                textPart.setContent(htmlContent, "text/html; charset=utf-8");
+                multipart.addBodyPart(textPart);
+
+                MimeBodyPart imagePart = new MimeBodyPart();
+                ByteArrayDataSource bds = new ByteArrayDataSource(imageBytes, "image/png");
+                imagePart.setDataHandler(new DataHandler(bds));
+                imagePart.setContentID("<qrcode_image>");
+                imagePart.setDisposition(MimeBodyPart.INLINE);
+                multipart.addBodyPart(imagePart);
+
+                message.setContent(multipart);
+                Transport.send(message);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void addOrderItem(String name, long price) {

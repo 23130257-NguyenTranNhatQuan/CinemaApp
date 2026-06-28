@@ -16,6 +16,13 @@
         android:gravity="center"
         android:textColor="#4CAF50" />
 
+    <ImageView
+        android:id="@+id/ivQRCode"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp" />
+
     <Button
         android:id="@+id/btnBackHome"
         android:layout_width="match_parent"
