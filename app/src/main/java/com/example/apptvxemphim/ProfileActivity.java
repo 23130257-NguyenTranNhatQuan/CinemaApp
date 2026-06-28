@@ -59,7 +59,8 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(ProfileActivity.this, CinemaListActivity.class));
                 return true;
             } else if (id == R.id.nav_news) {
-                Toast.makeText(this, "Chuyển sang Tin tức", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProfileActivity.this, NewsActivity.class));
+                overridePendingTransition(0, 0);
                 return true;
             } else if (id == R.id.nav_account) {
                 return true;

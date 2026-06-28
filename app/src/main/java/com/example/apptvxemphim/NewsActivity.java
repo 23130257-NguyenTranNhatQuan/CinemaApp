@@ -1,10 +1,19 @@
 package com.example.apptvxemphim;
 
+import android.content.Intent;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
@@ -14,40 +23,100 @@ public class NewsActivity extends AppCompatActivity {
 
     private RecyclerView rvNews;
     private NewsAdapter adapter;
-    private List<News> newsList = new ArrayList<>(); // Dùng List<News> thay vì Combo
+    private List<News> newsList = new ArrayList<>();
     private FirebaseFirestore db;
+    private Toolbar toolbar;
+    private ProgressBar progressBar;
+    private LinearLayout emptyState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
 
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+            getSupportActionBar().setTitle("Tin tức & Khuyến mãi");
+        }
+
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
         rvNews = findViewById(R.id.rvNews);
+        progressBar = findViewById(R.id.progressBar);
+        emptyState = findViewById(R.id.emptyState);
+
         db = FirebaseFirestore.getInstance();
 
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.nav_news);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                if (id == R.id.nav_home) {
+                    startActivity(new Intent(NewsActivity.this, MainActivity.class));
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return true;
+                } else if (id == R.id.nav_ticket) {
+                    startActivity(new Intent(NewsActivity.this, CinemaListActivity.class));
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return true;
+                } else if (id == R.id.nav_news) {
+                    return true;
+                } else if (id == R.id.nav_account) {
+                    startActivity(new Intent(NewsActivity.this, ProfileActivity.class));
+                    overridePendingTransition(0, 0);
+                    finish();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         // Cấu hình LayoutManager
-        rvNews.setLayoutManager(new LinearLayoutManager(this));
+        rvNews.setLayoutManager(new LinearLayoutManager(NewsActivity.this));
 
         // Tải dữ liệu
         loadNewsFromFirebase();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
     private void loadNewsFromFirebase() {
-        // Lưu ý: Tên collection trong Firestore của bạn là "News" hay "news"?
-        // Hãy chắc chắn viết hoa/thường khớp với trên Console.
+        progressBar.setVisibility(View.VISIBLE);
+        rvNews.setVisibility(View.GONE);
+        emptyState.setVisibility(View.GONE);
+
         db.collection("News").get().addOnCompleteListener(task -> {
+            progressBar.setVisibility(View.GONE);
             if (task.isSuccessful() && task.getResult() != null) {
                 newsList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    // Chuyển đổi dữ liệu từ Firestore sang Object News
                     News news = document.toObject(News.class);
                     newsList.add(news);
                 }
 
-                adapter = new NewsAdapter(newsList, NewsActivity.this);
-                rvNews.setAdapter(adapter);
+                if (newsList.isEmpty()) {
+                    emptyState.setVisibility(View.VISIBLE);
+                    rvNews.setVisibility(View.GONE);
+                } else {
+                    adapter = new NewsAdapter(newsList, NewsActivity.this);
+                    rvNews.setAdapter(adapter);
+                    rvNews.setVisibility(View.VISIBLE);
+                }
             } else {
-                Toast.makeText(this, "Không tải được dữ liệu!", Toast.LENGTH_SHORT).show();
+                emptyState.setVisibility(View.VISIBLE);
+                rvNews.setVisibility(View.GONE);
+                Toast.makeText(this, "Không tải được dữ liệu! Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show();
             }
         });
     }
