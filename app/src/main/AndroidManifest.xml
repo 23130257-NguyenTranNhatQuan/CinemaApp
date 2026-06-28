@@ -72,6 +72,9 @@
         <activity android:name=".HallEditActivity" />
         <activity android:name=".CinemaListActivity" />
         <activity android:name=".CinemaShowtimeActivity" />
+        <activity android:name=".ManageNewsActivity" />
+        <activity android:name=".AddEditNewsActivity" />
+
     </application>
 
 </manifest>

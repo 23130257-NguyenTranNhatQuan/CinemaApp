@@ -24,7 +24,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // LƯU Ý: Bạn cần tạo file layout 'item_news.xml' để hiển thị đẹp như web
         View view = LayoutInflater.from(context).inflate(R.layout.item_news, parent, false);
         return new ViewHolder(view);
     }
@@ -33,21 +32,21 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         News news = newsList.get(position);
 
-        holder.tvTitle.setText(news.title);
+        holder.tvTitle.setText(news.getTitle());
 
         // Sử dụng Glide để load ảnh từ Firebase URL
         Glide.with(context)
-                .load(news.imageUrl)
-                .placeholder(R.drawable.ic_launcher_background) // Ảnh mặc định khi đang tải
-                .error(R.drawable.ic_launcher_foreground)       // Ảnh khi lỗi
+                .load(news.getImageUrl())
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_foreground)
                 .into(holder.imgPoster);
 
         // Sự kiện click để xem chi tiết
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, NewsDetailActivity.class);
-            intent.putExtra("title", news.title);
-            intent.putExtra("imageUrl", news.imageUrl);
-            intent.putExtra("content", news.content);
+            intent.putExtra("title", news.getTitle());
+            intent.putExtra("imageUrl", news.getImageUrl());
+            intent.putExtra("content", news.getContent());
             context.startActivity(intent);
         });
     }
@@ -63,8 +62,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         public ViewHolder(View itemView) {
             super(itemView);
-            imgPoster = itemView.findViewById(R.id.imgPoster); // Cần có ID này trong item_news.xml
-            tvTitle = itemView.findViewById(R.id.tvTitle);     // Cần có ID này trong item_news.xml
+            imgPoster = itemView.findViewById(R.id.imgPoster);
+            tvTitle = itemView.findViewById(R.id.tvTitle);
         }
     }
 }

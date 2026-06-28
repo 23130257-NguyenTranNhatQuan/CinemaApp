@@ -10,13 +10,13 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
-    private CardView cardMovies, cardCinemas, cardTickets, cardUsers, cardStats, cardHalls;
-    private Button btnLogout;
+    private CardView cardMovies, cardCinemas, cardTickets, cardUsers, cardStats, cardHalls, cardNews;
+    private Button btnLogout, btnHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_dashboard); // File XML đã tạo ở bước trước
+        setContentView(R.layout.activity_admin_dashboard);
 
         // 1. Ánh xạ giao diện
         cardMovies = findViewById(R.id.card_manage_movies);
@@ -25,7 +25,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
         cardTickets = findViewById(R.id.card_manage_tickets);
         cardUsers = findViewById(R.id.card_manage_users);
         cardStats = findViewById(R.id.card_statistics);
+        cardNews = findViewById(R.id.card_manage_news);
         btnLogout = findViewById(R.id.btn_admin_logout);
+        btnHome = findViewById(R.id.btn_admin_home);
 
         // 2. Bắt sự kiện Click cho từng khối chức năng
         cardMovies.setOnClickListener(v -> {
@@ -56,6 +58,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
             Toast.makeText(this, "Đang mở Quản lý Người dùng...", Toast.LENGTH_SHORT).show();
         });
 
+        cardNews.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageNewsActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "Đang mở Quản lý Tin tức...", Toast.LENGTH_SHORT).show();
+        });
+
         cardStats.setOnClickListener(v -> {
             Toast.makeText(this, "Đang mở Thống kê Doanh thu...", Toast.LENGTH_SHORT).show();
         });
@@ -66,8 +74,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Đã đăng xuất khỏi tài khoản Admin", Toast.LENGTH_SHORT).show();
 
-            // Quay về trang Login và xóa các trang admin khỏi lịch sử để không ấn Back lại được
             Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+        // 4. Về trang chủ
+        btnHome.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
