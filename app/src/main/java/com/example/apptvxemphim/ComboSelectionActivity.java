@@ -44,9 +44,9 @@ public class ComboSelectionActivity extends AppCompatActivity implements ComboAd
             ArrayList<Combo> selectedCombos = new ArrayList<>();
             long comboPriceTotal = 0;
             for (Combo c : allItems) {
-                if (!c.isHeader && c.quantity > 0) {
+                if (c.getQuantity() > 0) {
                     selectedCombos.add(c);
-                    comboPriceTotal += ((long) c.price * c.quantity);
+                    comboPriceTotal += (c.getPrice() * c.getQuantity());
                 }
             }
 
@@ -86,23 +86,41 @@ public class ComboSelectionActivity extends AppCompatActivity implements ComboAd
         // Lấy toàn bộ document trong collection "combos"
         db.collection("combos").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
+                // Định nghĩa thứ tự các danh mục
+                String[] categoryOrder = {"THỨC UỐNG", "ĂN VẶT", "BẮP RANG", "COMBO"};
                 Map<String, List<Combo>> groupedMap = new LinkedHashMap<>();
+
+                // Khởi tạo map với thứ tự cố định
+                for (String cat : categoryOrder) {
+                    groupedMap.put(cat, new ArrayList<>());
+                }
 
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     Combo combo = document.toObject(Combo.class);
                     if (combo != null) {
-                        String category = (combo.category != null) ? combo.category.toUpperCase() : "KHÁC";
-                        if (!groupedMap.containsKey(category)) {
-                            groupedMap.put(category, new ArrayList<>());
+                        String category = (combo.getCategory() != null) ? combo.getCategory().toUpperCase() : "KHÁC";
+                        // Nếu category không nằm trong 4 mục chính, thêm vào COMBO
+                        boolean found = false;
+                        for (String cat : categoryOrder) {
+                            if (category.contains(cat) || cat.contains(category)) {
+                                groupedMap.get(cat).add(combo);
+                                found = true;
+                                break;
+                            }
                         }
-                        groupedMap.get(category).add(combo);
+                        if (!found) {
+                            groupedMap.get("COMBO").add(combo);
+                        }
                     }
                 }
 
                 allItems.clear();
                 for (Map.Entry<String, List<Combo>> entry : groupedMap.entrySet()) {
-                    allItems.add(Combo.createHeader(entry.getKey()));
-                    allItems.addAll(entry.getValue());
+                    // Chỉ thêm header và items nếu có dữ liệu
+                    if (!entry.getValue().isEmpty()) {
+                        allItems.add(Combo.createHeader(entry.getKey()));
+                        allItems.addAll(entry.getValue());
+                    }
                 }
 
                 adapter.notifyDataSetChanged();
@@ -121,9 +139,7 @@ public class ComboSelectionActivity extends AppCompatActivity implements ComboAd
     private void updateTotalPrice() {
         long total = 0;
         for (Combo c : allItems) {
-            if (!c.isHeader) {
-                total += ((long) c.price * c.quantity);
-            }
+            total += (c.getPrice() * c.getQuantity());
         }
         tvTotalPrice.setText(String.format("%,d đ", total));
     }

@@ -139,9 +139,9 @@ public class CheckoutActivity extends AppCompatActivity {
         long comboTotal = 0;
         if (selectedCombos != null) {
             for (Combo c : selectedCombos) {
-                long itemTotal = (long) c.price * c.quantity;
+                long itemTotal = c.getPrice() * c.getQuantity();
                 comboTotal += itemTotal;
-                addOrderItem(c.name + " x" + c.quantity, itemTotal);
+                addOrderItem(c.getName() + " x" + c.getQuantity(), itemTotal);
             }
         }
         totalAmount = seatPrice + comboTotal;

@@ -62,6 +62,8 @@
         <activity android:name=".AddEditMovieActivity" android:exported="false" />
         <activity android:name=".ManageCinemasActivity" android:exported="false" />
         <activity android:name=".AddEditCinemaActivity" android:exported="false" />
+        <activity android:name=".ManageCombosActivity" android:exported="false" />
+        <activity android:name=".AddEditComboActivity" android:exported="false" />
         <activity android:name=".ManageUsersActivity" android:exported="false" />
         <activity android:name=".ComingSoonDetailActivity" android:exported="false" />
 

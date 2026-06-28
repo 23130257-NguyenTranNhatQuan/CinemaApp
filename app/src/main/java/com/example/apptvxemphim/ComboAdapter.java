@@ -28,7 +28,7 @@ public class ComboAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        return comboList.get(position).isHeader ? TYPE_HEADER : TYPE_ITEM;
+        return comboList.get(position).isHeader() ? TYPE_HEADER : TYPE_ITEM;
     }
 
     @NonNull
@@ -46,27 +46,28 @@ public class ComboAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Combo item = comboList.get(position);
-
+        
         if (holder instanceof HeaderViewHolder) {
-            ((HeaderViewHolder) holder).tvHeader.setText(item.name);
+            HeaderViewHolder h = (HeaderViewHolder) holder;
+            h.tvHeader.setText(item.getCategory());
         } else {
             ItemViewHolder h = (ItemViewHolder) holder;
-            h.tvName.setText(item.name);
-            h.tvDesc.setText(item.desc);
-            h.tvPrice.setText(String.format("%,d đ", item.price));
-            h.tvQuantity.setText(String.valueOf(item.quantity));
+            h.tvName.setText(item.getName());
+            h.tvDesc.setText(item.getDesc());
+            h.tvPrice.setText(String.format("%,d đ", item.getPrice()));
+            h.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
-            Glide.with(h.itemView.getContext()).load(item.imageUrl).into(h.imgCombo);
+            Glide.with(h.itemView.getContext()).load(item.getImageUrl()).into(h.imgCombo);
 
             h.btnPlus.setOnClickListener(v -> {
-                item.quantity++;
+                item.setQuantity(item.getQuantity() + 1);
                 notifyItemChanged(position);
                 listener.onQuantityChanged();
             });
 
             h.btnMinus.setOnClickListener(v -> {
-                if (item.quantity > 0) {
-                    item.quantity--;
+                if (item.getQuantity() > 0) {
+                    item.setQuantity(item.getQuantity() - 1);
                     notifyItemChanged(position);
                     listener.onQuantityChanged();
                 }
@@ -77,7 +78,7 @@ public class ComboAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemCount() { return comboList.size(); }
 
-    // ViewHolder cho thanh tiêu đề tím
+    // ViewHolder cho header
     public static class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView tvHeader;
         public HeaderViewHolder(View itemView) {

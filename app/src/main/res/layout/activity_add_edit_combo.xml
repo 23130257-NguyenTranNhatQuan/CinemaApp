@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_add_edit_combo_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thêm Combo Mới"
+            android:textColor="@color/purple_cinestar"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/et_combo_name"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Tên combo"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_combo_category"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Danh mục (VD: COMBO GẤU)"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_combo_desc"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Mô tả (VD: 4 Coke 22oz + 2 Bắp)"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_combo_price"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Giá (VNĐ)"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:inputType="number"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_combo_image"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Link Ảnh Combo"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btn_save_combo"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:backgroundTint="@color/primary_pink"
+            android:text="LƯU THÔNG TIN"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+    </LinearLayout>
+</ScrollView>
