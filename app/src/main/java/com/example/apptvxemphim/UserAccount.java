@@ -12,6 +12,7 @@ public class UserAccount {
     private String phone;
     private String role;
     private String user;
+    private boolean banned;
 
     public UserAccount() {}
 
@@ -34,4 +35,7 @@ public class UserAccount {
 
     public String getUser() { return user; }
     public void setUser(String user) { this.user = user; }
+
+    public boolean isBanned() { return banned; }
+    public void setBanned(boolean banned) { this.banned = banned; }
 }

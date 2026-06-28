@@ -1,7 +1,8 @@
 package com.example.apptvxemphim;
 
 import android.os.Bundle;
-import android.util.Patterns;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,15 +17,25 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText etFullName, etEmail, etPassword, etConfirmPassword;
     private Button btnRegister;
     private TextView tvBackToLogin;
+    private TextView tvEmailError, tvPasswordError, tvConfirmPasswordError;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+
+    private boolean isEmailValid = false;
+    private boolean isPasswordValid = false;
+    private boolean isConfirmPasswordValid = false;
+
+    // Regex patterns
+    private static final Pattern GMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@gmail\\.com$");
+    private static final Pattern PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{6,}$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +53,14 @@ public class RegisterActivity extends AppCompatActivity {
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnRegister = findViewById(R.id.btnRegister);
         tvBackToLogin = findViewById(R.id.tvBackToLogin);
+        tvEmailError = findViewById(R.id.tvEmailError);
+        tvPasswordError = findViewById(R.id.tvPasswordError);
+        tvConfirmPasswordError = findViewById(R.id.tvConfirmPasswordError);
+
+        // Setup real-time validation
+        setupEmailValidation();
+        setupPasswordValidation();
+        setupConfirmPasswordValidation();
 
         // Xử lý nút ĐĂNG KÝ
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -58,23 +77,26 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                // 2. Kiểm tra định dạng Email hợp lệ
-                if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    Toast.makeText(RegisterActivity.this, "Định dạng Email không hợp lệ!", Toast.LENGTH_SHORT).show();
+                // 2. Kiểm tra email phải là @gmail.com
+                if (!GMAIL_PATTERN.matcher(email).matches()) {
+                    tvEmailError.setVisibility(View.VISIBLE);
+                    tvEmailError.setText("Email phải có đuôi @gmail.com");
                     etEmail.requestFocus();
                     return;
                 }
 
-                // 3. Kiểm tra độ dài mật khẩu
-                if (password.length() < 6) {
-                    Toast.makeText(RegisterActivity.this, "Mật khẩu phải từ 6 ký tự trở lên!", Toast.LENGTH_SHORT).show();
+                // 3. Kiểm tra mật khẩu: từ 6 ký tự, có chữ thường, chữ hoa và số
+                if (!PASSWORD_PATTERN.matcher(password).matches()) {
+                    tvPasswordError.setVisibility(View.VISIBLE);
+                    tvPasswordError.setText("Mật khẩu phải từ 6 ký tự, có chữ thường, chữ hoa và số");
                     etPassword.requestFocus();
                     return;
                 }
 
                 // 4. Kiểm tra xác nhận mật khẩu
                 if (!password.equals(confirmPassword)) {
-                    Toast.makeText(RegisterActivity.this, "Mật khẩu xác nhận không khớp!", Toast.LENGTH_SHORT).show();
+                    tvConfirmPasswordError.setVisibility(View.VISIBLE);
+                    tvConfirmPasswordError.setText("Mật khẩu xác nhận không khớp");
                     etConfirmPassword.requestFocus();
                     return;
                 }
@@ -94,6 +116,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     userData.put("email", email);
                                     userData.put("password", password);
                                     userData.put("user", shortName);
+                                    userData.put("role", "user");
 
                                     // LƯU LÊN FIRESTORE TRƯỚC
                                     db.collection("User").document(userId)
@@ -137,5 +160,93 @@ public class RegisterActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void setupEmailValidation() {
+        etEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String email = s.toString().trim();
+                if (email.isEmpty()) {
+                    tvEmailError.setVisibility(View.GONE);
+                    isEmailValid = false;
+                } else if (!GMAIL_PATTERN.matcher(email).matches()) {
+                    tvEmailError.setVisibility(View.VISIBLE);
+                    tvEmailError.setText("Email phải có đuôi @gmail.com");
+                    isEmailValid = false;
+                } else {
+                    tvEmailError.setVisibility(View.GONE);
+                    isEmailValid = true;
+                }
+            }
+        });
+    }
+
+    private void setupPasswordValidation() {
+        etPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String password = s.toString().trim();
+                if (password.isEmpty()) {
+                    tvPasswordError.setVisibility(View.GONE);
+                    isPasswordValid = false;
+                } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
+                    tvPasswordError.setVisibility(View.VISIBLE);
+                    tvPasswordError.setText("Mật khẩu phải từ 6 ký tự, có chữ thường, chữ hoa và số");
+                    isPasswordValid = false;
+                } else {
+                    tvPasswordError.setVisibility(View.GONE);
+                    isPasswordValid = true;
+                }
+                // Re-check confirm password when password changes
+                String confirmPassword = etConfirmPassword.getText().toString().trim();
+                if (!confirmPassword.isEmpty()) {
+                    validateConfirmPassword(confirmPassword);
+                }
+            }
+        });
+    }
+
+    private void setupConfirmPasswordValidation() {
+        etConfirmPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String confirmPassword = s.toString().trim();
+                validateConfirmPassword(confirmPassword);
+            }
+        });
+    }
+
+    private void validateConfirmPassword(String confirmPassword) {
+        String password = etPassword.getText().toString().trim();
+        if (confirmPassword.isEmpty()) {
+            tvConfirmPasswordError.setVisibility(View.GONE);
+            isConfirmPasswordValid = false;
+        } else if (!confirmPassword.equals(password)) {
+            tvConfirmPasswordError.setVisibility(View.VISIBLE);
+            tvConfirmPasswordError.setText("Mật khẩu xác nhận không khớp");
+            isConfirmPasswordValid = false;
+        } else {
+            tvConfirmPasswordError.setVisibility(View.GONE);
+            isConfirmPasswordValid = true;
+        }
     }
 }

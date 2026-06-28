@@ -3,6 +3,7 @@ package com.example.apptvxemphim;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,9 +12,16 @@ import java.util.List;
 public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.ViewHolder> {
 
     private List<UserAccount> userList;
+    private OnUserActionListener listener;
 
-    public AdminUserAdapter(List<UserAccount> userList) {
+    public interface OnUserActionListener {
+        void onRoleChange(UserAccount user);
+        void onBanUnban(UserAccount user);
+    }
+
+    public AdminUserAdapter(List<UserAccount> userList, OnUserActionListener listener) {
         this.userList = userList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -49,6 +57,28 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
         holder.tvRole.setTextColor(holder.itemView.getContext().getResources().getColor(
                 role.equals("admin") ? android.R.color.holo_orange_dark : android.R.color.holo_blue_dark
         ));
+
+        // Update ban/unban button text
+        if (user.isBanned()) {
+            holder.btnBanUnban.setText("Unban");
+            holder.btnBanUnban.setBackgroundTintList(holder.itemView.getContext().getResources().getColorStateList(android.R.color.holo_green_dark));
+        } else {
+            holder.btnBanUnban.setText("Ban");
+            holder.btnBanUnban.setBackgroundTintList(holder.itemView.getContext().getResources().getColorStateList(android.R.color.holo_red_dark));
+        }
+
+        // Set click listeners
+        holder.btnChangeRole.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRoleChange(user);
+            }
+        });
+
+        holder.btnBanUnban.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onBanUnban(user);
+            }
+        });
     }
 
     @Override
@@ -58,6 +88,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvEmail, tvPhone, tvRole;
+        Button btnChangeRole, btnBanUnban;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -65,6 +96,8 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
             tvEmail = itemView.findViewById(R.id.tv_admin_user_email);
             tvPhone = itemView.findViewById(R.id.tv_admin_user_phone);
             tvRole = itemView.findViewById(R.id.tv_admin_user_role);
+            btnChangeRole = itemView.findViewById(R.id.btn_change_role);
+            btnBanUnban = itemView.findViewById(R.id.btn_ban_unban);
         }
     }
 }
