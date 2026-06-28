@@ -1,10 +1,15 @@
 package com.example.apptvxemphim;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 public class PaymentResultActivity extends AppCompatActivity {
     @Override
@@ -14,6 +19,16 @@ public class PaymentResultActivity extends AppCompatActivity {
 
         TextView tvStatus = findViewById(R.id.tvPaymentStatus);
         Button btnBackHome = findViewById(R.id.btnBackHome);
+        String orderId = getIntent().getStringExtra("ORDER_ID");
+        ImageView ivQRCode = findViewById(R.id.ivQRCode);
+
+        try {
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.encodeBitmap(orderId, BarcodeFormat.QR_CODE, 400, 400);
+            ivQRCode.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         boolean isSuccess = getIntent().getBooleanExtra("IS_SUCCESS", false);
         if (isSuccess) {
