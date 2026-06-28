@@ -141,25 +141,32 @@ public class SeatSelectionActivity extends AppCompatActivity {
             }
             if (selected.isEmpty()) return;
 
+            ArrayList<String> seatNamesList = new ArrayList<>();
+            StringBuilder seatNamesBuilder = new StringBuilder(); // Dùng cái này để nối tên
             long seatTotal = 0;
-            StringBuilder seatNames = new StringBuilder();
+
             for (int i = 0; i < selected.size(); i++) {
                 SeatMapView.Seat s = selected.get(i);
-                if (i > 0) seatNames.append(", ");
-                seatNames.append(s.name);
+                seatNamesList.add(s.name);
+                seatNamesBuilder.append(s.name);
+                if (i < selected.size() - 1) seatNamesBuilder.append(", ");
+
                 if (s.type == 1) seatTotal += 80000;
                 else if (s.type == 2) seatTotal += 110000;
                 else if (s.type == 3) seatTotal += 220000;
             }
 
-            android.content.Intent intent = new android.content.Intent(this, ComboSelectionActivity.class);
+            Intent intent = new Intent(this, ComboSelectionActivity.class);
             intent.putExtra("MOVIE_TITLE",   getIntent().getStringExtra("MOVIE_TITLE"));
             intent.putExtra("SHOWTIME_ID",   getIntent().getStringExtra("SHOWTIME_ID"));
             intent.putExtra("SHOWTIME_TIME", getIntent().getStringExtra("SHOWTIME_TIME"));
             intent.putExtra("SHOWTIME_DATE", getIntent().getStringExtra("SHOWTIME_DATE"));
             intent.putExtra("SHOWTIME_LANG", getIntent().getStringExtra("SHOWTIME_LANG"));
             intent.putExtra("HALL_ID",       getIntent().getStringExtra("HALL_ID"));
-            intent.putExtra("SEAT_NAMES",    seatNames.toString());
+
+            // Truyền cả hai: ArrayList để logic xử lý, String để hiển thị
+            intent.putStringArrayListExtra("SELECTED_SEATS", seatNamesList);
+            intent.putExtra("SEAT_NAMES",    seatNamesBuilder.toString());
             intent.putExtra("SEAT_TOTAL",    seatTotal);
             intent.putExtra("SEAT_COUNT",    selected.size());
             startActivity(intent);

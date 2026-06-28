@@ -10,6 +10,8 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
 
 public class PaymentActivity extends AppCompatActivity {
     private WebView webView;
@@ -20,25 +22,21 @@ public class PaymentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
 
-        // 1. Ánh xạ view
         webView = findViewById(R.id.webViewPayment);
         progressBar = findViewById(R.id.progressBar);
 
-        // 2. Cấu hình WebView
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUserAgentString("Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36");
 
-        // 3. Nhận URL thanh toán từ CheckoutActivity
         String url = getIntent().getStringExtra("PAY_URL");
         if (url == null || url.isEmpty()) {
-            Toast.makeText(this, "URL thanh toán không hợp lệ!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "URL không hợp lệ", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // 4. Thiết lập WebViewClient để lắng nghe luồng thanh toán
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -56,40 +54,51 @@ public class PaymentActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String currentUrl = request.getUrl().toString();
 
-                // Lắng nghe tín hiệu thanh toán thành công (thường là URL chứa từ khóa "success" hoặc "callback")
                 if (currentUrl.contains("success")) {
+                    ArrayList<String> selectedSeats = getIntent().getStringArrayListExtra("SELECTED_SEATS");
+                    String showtimeId = getIntent().getStringExtra("SHOWTIME_ID");
+
+                    updateSeatsToBooked(showtimeId, selectedSeats);
+
                     Intent intent = new Intent(PaymentActivity.this, PaymentResultActivity.class);
                     intent.putExtra("IS_SUCCESS", true);
                     startActivity(intent);
-                    finish(); // Kết thúc PaymentActivity để người dùng không quay lại WebView được nữa
-                    return true;
-                }
-
-                // Nếu trang là lỗi hoặc hủy, có thể xử lý thêm ở đây
-                if (currentUrl.contains("cancel")) {
-                    Toast.makeText(PaymentActivity.this, "Giao dịch đã bị hủy", Toast.LENGTH_SHORT).show();
                     finish();
                     return true;
                 }
 
-                return false; // Tiếp tục load trang bình thường
+                if (currentUrl.contains("cancel")) {
+                    Toast.makeText(PaymentActivity.this, "Giao dịch đã hủy", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return true;
+                }
+
+                return false;
             }
         });
-        if (url == null || url.startsWith("https://onepay.vn/checkout") == false) {
-            android.util.Log.e("DEBUG_URL", "URL bị thiếu hoặc sai đường dẫn: " + url);
-        }
-        // 5. Tải trang thanh toán
+
         webView.loadUrl(url);
-        android.util.Log.e("DEBUG_URL", "Đang load URL: " + url);
     }
 
-    // Xử lý nút Back của điện thoại để không thoát app đột ngột
     @Override
     public void onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void updateSeatsToBooked(String showtimeId, ArrayList<String> selectedSeats) {
+        if (showtimeId == null || selectedSeats == null) return;
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        for (String seatId : selectedSeats) {
+            db.collection("Showtime").document(showtimeId)
+                    .collection("Seats").document(seatId)
+                    .update("status", "booked")
+                    .addOnSuccessListener(aVoid -> android.util.Log.d("Firebase", "Update success: " + seatId))
+                    .addOnFailureListener(e -> android.util.Log.e("Firebase", "Update error: " + e.getMessage()));
         }
     }
 }
