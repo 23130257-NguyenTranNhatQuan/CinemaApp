@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_add_edit_cinema_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thêm Rạp Mới"
+            android:textColor="@color/purple_cinestar"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/et_cinema_name"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Tên rạp"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_cinema_address"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Địa chỉ"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_cinema_brand"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Thương hiệu"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_cinema_logo"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Link Logo"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_cinema_phone"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Số điện thoại"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_cinema_photo"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Link Ảnh Rạp"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <EditText
+            android:id="@+id/et_cinema_ggmap"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Link Google Maps"
+            android:background="@drawable/bg_spinner_purple"
+            android:textColor="@color/white"
+            android:textColorHint="#D4C4EB"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <WebView
+            android:id="@+id/webview_map"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginBottom="12dp"/>
+
+        <Button
+            android:id="@+id/btn_save_cinema"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:backgroundTint="@color/primary_pink"
+            android:text="LƯU THÔNG TIN"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+    </LinearLayout>
+</ScrollView>

@@ -9,6 +9,7 @@ public class Cinema {
     private String brand;
     private String phone;
     private String photo;
+    private String ggmap;
 
     public Cinema() {}
 
@@ -28,5 +29,7 @@ public class Cinema {
     public void setPhone(String v) { phone = v; }
     public String getPhoto() { return photo; }
     public void setPhoto(String v) { photo = v; }
+    public String getGgmap() { return ggmap; }
+    public void setGgmap(String v) { ggmap = v; }
 
 }
