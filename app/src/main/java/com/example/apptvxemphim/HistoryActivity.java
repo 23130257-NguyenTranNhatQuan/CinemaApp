@@ -17,8 +17,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -37,60 +39,74 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        // Khởi tạo Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Ánh xạ View
         btnBack = findViewById(R.id.btnBack);
         rvHistoryTickets = findViewById(R.id.rvHistoryTickets);
         tvEmptyState = findViewById(R.id.tvEmptyState);
 
-        // Nút quay lại màn hình Profile
-        btnBack.setOnClickListener(v -> finish());
-
-        // Cài đặt RecyclerView (Cuộn dọc)
         rvHistoryTickets.setLayoutManager(new LinearLayoutManager(this));
         ticketList = new ArrayList<>();
         adapter = new HistoryTicketAdapter(ticketList);
         rvHistoryTickets.setAdapter(adapter);
 
-        // Tải dữ liệu lịch sử vé
-        loadHistoryTickets();
+        btnBack.setOnClickListener(v -> finish());
+
+        loadBookingHistory();
     }
 
-    private void loadHistoryTickets() {
-        if (mAuth.getCurrentUser() != null) {
-            String userId = mAuth.getCurrentUser().getUid();
+    private void loadBookingHistory() {
+        if (mAuth.getCurrentUser() == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            // Truy vấn lấy TẤT CẢ vé của user này
-            db.collection("Tickets")
-                    .whereEqualTo("userId", userId)
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
+        String currentUserId = mAuth.getCurrentUser().getUid();
+
+        // 1. Truy vấn đúng Collection "Booking" và lọc theo "user_id" như trong ảnh
+        db.collection("Booking")
+                .whereEqualTo("user_id", currentUserId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
                         ticketList.clear();
-                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                            // Lấy các trường dữ liệu từ Firebase
-                            String movieTitle = doc.getString("movieTitle");
-                            String cinemaName = doc.getString("cinemaName");
-                            String showtime = doc.getString("showtime");
-                            String seats = doc.getString("seats");
-                            Long totalPrice = doc.getLong("totalPrice");
 
-                            if (movieTitle != null) {
-                                // Gộp chuỗi theo cú pháp riêng biệt bằng ký tự \n để Adapter dễ dàng cắt chuỗi
-                                // Định dạng: Tên Phim \n Rạp • Thời gian \n Ghế: X \n Tổng tiền: Y
-                                String priceStr = (totalPrice != null) ? String.format("%,d VNĐ", totalPrice) : "Đang cập nhật";
-                                String cinemaAndTime = (cinemaName != null ? cinemaName : "Rạp") + " • " + (showtime != null ? showtime : "Thời gian");
-                                String seatStr = "Ghế: " + (seats != null ? seats : "Trống");
-                                String priceInfo = "Tổng tiền: " + priceStr;
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // 2. Lấy ĐÚNG các trường dữ liệu có trong ảnh Firestore của bạn
 
-                                String fullTicketData = movieTitle + "\n" + cinemaAndTime + "\n" + seatStr + "\n" + priceInfo;
-                                ticketList.add(fullTicketData);
+                            // Lấy showtime_id (Vì không có Tên phim)
+                            String showtimeId = document.getString("showtime_id");
+                            if (showtimeId == null) showtimeId = "Không rõ mã suất chiếu";
+
+                            // Lấy booking_time (Định dạng lại ngày giờ)
+                            com.google.firebase.Timestamp timestamp = document.getTimestamp("booking_time");
+                            String timeString = "Không rõ thời gian";
+                            if (timestamp != null) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                                timeString = sdf.format(timestamp.toDate());
                             }
+
+                            // Lấy mảng seats và nối lại thành chuỗi
+                            List<String> seatsArray = (List<String>) document.get("seats");
+                            String seatsString = "Chưa chọn";
+                            if (seatsArray != null && !seatsArray.isEmpty()) {
+                                seatsString = android.text.TextUtils.join(", ", seatsArray);
+                            }
+
+                            // Lấy total_price
+                            Long totalPrice = document.getLong("total_price");
+                            String priceString = (totalPrice != null) ? String.format(Locale.getDefault(), "%,d đ", totalPrice) : "0 đ";
+
+                            // 3. Đóng gói lại thành chuỗi 4 dòng để đẩy vào Adapter
+                            String formattedTicket = "Mã suất chiếu: " + showtimeId + "\n"
+                                    + "Ngày đặt: " + timeString + "\n"
+                                    + "Ghế: " + seatsString + "\n"
+                                    + "Tổng tiền: " + priceString;
+
+                            ticketList.add(formattedTicket);
                         }
 
-                        // Nếu không có vé nào, hiển thị text "Chưa có giao dịch"
                         if (ticketList.isEmpty()) {
                             tvEmptyState.setVisibility(View.VISIBLE);
                             rvHistoryTickets.setVisibility(View.GONE);
@@ -100,18 +116,14 @@ public class HistoryActivity extends AppCompatActivity {
                         }
 
                         adapter.notifyDataSetChanged();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(HistoryActivity.this, "Lỗi tải lịch sử vé!", Toast.LENGTH_SHORT).show();
-                    });
-        }
+                    } else {
+                        Toast.makeText(HistoryActivity.this, "Lỗi tải lịch sử!", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
-    // =========================================================================
-    // ADAPTER HIỂN THỊ VÉ - Tái sử dụng giao diện item_ticket.xml
-    // =========================================================================
-    private class HistoryTicketAdapter extends RecyclerView.Adapter<HistoryTicketAdapter.ViewHolder> {
-        private List<String> data;
+    class HistoryTicketAdapter extends RecyclerView.Adapter<HistoryTicketAdapter.ViewHolder> {
+        private final List<String> data;
 
         public HistoryTicketAdapter(List<String> data) {
             this.data = data;
@@ -120,7 +132,6 @@ public class HistoryActivity extends AppCompatActivity {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            // Dùng chung item_ticket.xml đã thiết kế
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ticket, parent, false);
             return new ViewHolder(view);
         }
@@ -130,22 +141,10 @@ public class HistoryActivity extends AppCompatActivity {
             String item = data.get(position);
             String[] parts = item.split("\n");
 
-            // Kiểm tra và đổ dữ liệu chuẩn xác vào các trường của thẻ vé
-            if (parts.length > 0) holder.tvMovieTitle.setText(parts[0]);
-            if (parts.length > 1) holder.tvCinemaAndTime.setText(parts[1]);
-
-            // Xử lý ẩn/hiện nếu thiếu thông tin
-            if (parts.length > 2) {
-                holder.tvSeatNumber.setText(parts[2]);
-            } else {
-                holder.tvSeatNumber.setText("Ghế: Đang cập nhật");
-            }
-
-            if (parts.length > 3) {
-                holder.tvTicketId.setText(parts[3]);
-            } else {
-                holder.tvTicketId.setText("Tổng tiền: ---");
-            }
+            if (parts.length > 0) holder.tvMovieTitle.setText(parts[0]);     // Hiện: Mã suất chiếu...
+            if (parts.length > 1) holder.tvCinemaAndTime.setText(parts[1]);  // Hiện: Ngày đặt...
+            if (parts.length > 2) holder.tvSeatNumber.setText(parts[2]);     // Hiện: Ghế...
+            if (parts.length > 3) holder.tvTicketId.setText(parts[3]);       // Hiện: Tổng tiền...
         }
 
         @Override
@@ -158,7 +157,6 @@ public class HistoryActivity extends AppCompatActivity {
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                // Các ID này dựa trên thiết kế item_ticket.xml siêu đẹp ở bước trước
                 tvMovieTitle = itemView.findViewById(R.id.tvMovieTitle);
                 tvCinemaAndTime = itemView.findViewById(R.id.tvCinemaAndTime);
                 tvSeatNumber = itemView.findViewById(R.id.tvSeatNumber);
