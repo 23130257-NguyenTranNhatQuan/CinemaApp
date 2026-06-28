@@ -2,15 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#4A148C"
-    android:padding="16dp">
+    android:background="@color/purple_cinestar"
+    android:padding="12dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp">
 
     <TextView
         android:id="@+id/tvHeader"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
+        android:text="DANH MỤC"
+        android:textColor="@color/white"
         android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="HEADER TITLE" />
+        android:textStyle="bold" />
 </LinearLayout>
