@@ -33,6 +33,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         News news = newsList.get(position);
 
         holder.tvTitle.setText(news.getTitle());
+        holder.tvSnippet.setText(news.getContent());
 
         // Sử dụng Glide để load ảnh từ Firebase URL
         Glide.with(context)
@@ -59,11 +60,13 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgPoster;
         TextView tvTitle;
+        TextView tvSnippet;
 
         public ViewHolder(View itemView) {
             super(itemView);
             imgPoster = itemView.findViewById(R.id.imgPoster);
             tvTitle = itemView.findViewById(R.id.tvTitle);
+            tvSnippet = itemView.findViewById(R.id.tvSnippet);
         }
     }
 }

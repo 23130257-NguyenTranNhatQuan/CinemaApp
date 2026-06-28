@@ -23,9 +23,11 @@ import com.example.apptvxemphim.News;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rcvNews;
     private NewsAdapter newsAdapter;
     private List<News> newsList;
+    private ImageButton btnNewsPrev, btnNewsNext;
+    private LinearLayout layoutNewsDots;
+    private int newsCurrentPage = 0;
+    private int totalNews = 0;
+    private Handler newsSliderHandler = new Handler(Looper.getMainLooper());
 
     private ImageView[] bannerImages;
     private ImageButton btnPrev, btnNext;
@@ -73,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, CinemaListActivity.class));
                     return true;
                 } else if (id == R.id.nav_news) {
-                    Toast.makeText(MainActivity.this, "Chuyển sang Tin tức", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(MainActivity.this, NewsActivity.class));
                     return true;
                 } else if (id == R.id.nav_account) {
                     Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
@@ -185,12 +192,41 @@ public class MainActivity extends AppCompatActivity {
         movieCarouselAdapter = new MovieCarouselAdapter(movieList);
         rcvMovies.setAdapter(movieCarouselAdapter);
 
-        // Setup News
+        // Setup News - Horizontal carousel with snap
         rcvNews = findViewById(R.id.rcv_news);
-        rcvNews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rcvNews.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         newsList = new ArrayList<>();
         newsAdapter = new NewsAdapter(newsList, MainActivity.this);
         rcvNews.setAdapter(newsAdapter);
+
+        LinearSnapHelper newsSnapHelper = new LinearSnapHelper();
+        newsSnapHelper.attachToRecyclerView(rcvNews);
+
+        btnNewsPrev = findViewById(R.id.btn_news_prev);
+        btnNewsNext = findViewById(R.id.btn_news_next);
+        layoutNewsDots = findViewById(R.id.layout_news_dots);
+
+        btnNewsPrev.setOnClickListener(v -> {
+            if (newsCurrentPage > 0) newsCurrentPage--;
+            else newsCurrentPage = totalNews - 1;
+            smoothScrollToNewsPosition(newsCurrentPage);
+        });
+
+        btnNewsNext.setOnClickListener(v -> {
+            if (newsCurrentPage < totalNews - 1) newsCurrentPage++;
+            else newsCurrentPage = 0;
+            smoothScrollToNewsPosition(newsCurrentPage);
+        });
+
+        rcvNews.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    updateNewsPageFromScroll();
+                }
+            }
+        });
 
         // Load data from Firebase
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -227,20 +263,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        db.collection("News").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
-                newsList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    News news = document.toObject(News.class);
-                    newsList.add(news);
-                }
-                newsAdapter.notifyDataSetChanged();
-            } else {
-                Log.e("Loi_Firebase", "Lỗi tải tin tức: " + (task.getException() != null ? task.getException().getMessage() : "Unknown"));
-                Log.w("FirebaseTest", "Lỗi lấy dữ liệu tin tức", task.getException());
-                loadPlaceholderNews();
-            }
-        });
+        loadHomePageNews();
     }
     private void loadPlaceholderComingSoon() {
         comingSoonList.clear();
@@ -262,15 +285,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void loadHomePageNews() {
+        FirebaseFirestore.getInstance().collection("News")
+                .whereIn(FieldPath.documentId(), Arrays.asList("news1", "news2", "news3", "news4"))
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        newsList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            News news = document.toObject(News.class);
+                            newsList.add(news);
+                        }
+                        newsAdapter.notifyDataSetChanged();
+                        totalNews = newsList.size();
+                    } else {
+                        loadPlaceholderNews();
+                    }
+                });
+    }
+
     private void loadPlaceholderNews() {
         newsList.clear();
-        // Tạo dữ liệu mẫu kiểu News
-        newsList.add(new News("Ưu đãi đặc biệt", "url_anh_1", "Nội dung ưu đãi 1"));
-        newsList.add(new News("Mua 1 tặng 1", "url_anh_2", "Nội dung ưu đãi 2"));
-
-        if (newsAdapter != null) {
-            newsAdapter.notifyDataSetChanged();
-        }
         String[] placeholderImages = {
                 "https://via.placeholder.com/400x200/FF9800/FFFFFF?text=Uu+ Dai+1",
                 "https://via.placeholder.com/400x200/E91E63/FFFFFF?text=Uu+ Dai+2",
@@ -286,13 +321,13 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < placeholderImages.length; i++) {
             News news = new News();
-
             news.setTitle(names[i]);
             news.setImageUrl(placeholderImages[i]);
-
+            news.setContent("Nội dung mẫu " + (i + 1));
             newsList.add(news);
         }
         newsAdapter.notifyDataSetChanged();
+        totalNews = newsList.size();
     }
 
     private void loadBannersFromFirebase() {
@@ -385,6 +420,37 @@ public class MainActivity extends AppCompatActivity {
         } else {
             btnPrev.setVisibility(View.VISIBLE);
             btnNext.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    private void smoothScrollToNewsPosition(int position) {
+        if (rcvNews != null && newsAdapter != null && newsAdapter.getItemCount() > 0 && position >= 0 && position < newsAdapter.getItemCount()) {
+            rcvNews.smoothScrollToPosition(position);
+            setupNewsDots(position);
+        }
+    }
+
+    private void updateNewsPageFromScroll() {
+        if (rcvNews == null || rcvNews.getLayoutManager() == null) return;
+
+        LinearLayoutManager layoutManager = (LinearLayoutManager) rcvNews.getLayoutManager();
+        int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+
+        if (firstVisiblePosition != RecyclerView.NO_POSITION) {
+            newsCurrentPage = firstVisiblePosition;
+            setupNewsDots(newsCurrentPage);
+        }
+    }
+
+    private void setupNewsDots(int position) {
+        if (layoutNewsDots == null) return;
+
+        for (int i = 0; i < layoutNewsDots.getChildCount(); i++) {
+            View child = layoutNewsDots.getChildAt(i);
+            if (child != null) {
+                child.setSelected(i == position);
+            }
         }
     }
 

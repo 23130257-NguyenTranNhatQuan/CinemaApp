@@ -56,7 +56,8 @@ public class CinemaListActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_ticket) {
                     return true;
                 } else if (id == R.id.nav_news) {
-                    Toast.makeText(CinemaListActivity.this, "Tin tức", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(CinemaListActivity.this, NewsActivity.class));
+                    overridePendingTransition(0, 0);
                     return true;
                 } else if (id == R.id.nav_account) {
                     startActivity(new Intent(CinemaListActivity.this, ProfileActivity.class));
