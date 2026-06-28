@@ -13,7 +13,13 @@ import android.webkit.WebViewClient;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CheckoutActivity extends AppCompatActivity {
     private LinearLayout layoutOrderDetails, paymentContainer;
@@ -67,7 +73,6 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private void setupListeners() {
         findViewById(R.id.btnPayNow).setOnClickListener(v -> {
-            // Thay vì kiểm tra RadioGroup, ta kiểm tra trực tiếp các RadioButton
             if (!rbMomo.isChecked() && !rbATM.isChecked() && !rbVisa.isChecked()) {
                 Toast.makeText(this, "Vui lòng chọn phương thức thanh toán", Toast.LENGTH_SHORT).show();
                 return;
@@ -104,8 +109,6 @@ public class CheckoutActivity extends AppCompatActivity {
             webView.loadUrl("file:///android_asset/payment.html");
         });
     }
-
-    // --- CÁC HÀM CŨ CỦA BẠN (GIỮ NGUYÊN ĐỂ ĐẢM BẢO ĐỦ CODE) ---
 
     private void startPaymentTimer() {
         if (countDownTimer != null) countDownTimer.cancel();
@@ -152,15 +155,69 @@ public class CheckoutActivity extends AppCompatActivity {
     private boolean handlePaymentRedirection(String url) {
         if (url.contains("payment_success")) {
             if (countDownTimer != null) countDownTimer.cancel();
-            updateSeatsToBooked(getIntent().getStringExtra("SHOWTIME_ID"), getIntent().getStringArrayListExtra("SELECTED_SEATS"));
+
+            String showtimeId = getIntent().getStringExtra("SHOWTIME_ID");
+            ArrayList<String> selectedSeats = getIntent().getStringArrayListExtra("SELECTED_SEATS");
+
+            updateSeatsToBooked(showtimeId, selectedSeats);
+            saveBookingToFirebase();
             sendEmailConfirmation("Mã đơn: " + currentOrderId);
             Intent intent = new Intent(CheckoutActivity.this, PaymentResultActivity.class);
             intent.putExtra("IS_SUCCESS", true);
+            intent.putExtra("ORDER_ID", currentOrderId);
             startActivity(intent);
             finish();
             return true;
         }
         return false;
+    }
+
+    private void saveBookingToFirebase() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        String userId = mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : "Khách_Vãng_Lai";
+
+        Intent intent = getIntent();
+        String title = intent.getStringExtra("MOVIE_TITLE");
+        String time = intent.getStringExtra("SHOWTIME_TIME");
+        String date = intent.getStringExtra("SHOWTIME_DATE");
+        String hallId = intent.getStringExtra("HALL_ID");
+        ArrayList<String> seats = intent.getStringArrayListExtra("SELECTED_SEATS");
+        ArrayList<Combo> selectedCombos = intent.getParcelableArrayListExtra("selected_combos");
+
+        StringBuilder comboString = new StringBuilder();
+        if (selectedCombos != null && !selectedCombos.isEmpty()) {
+            for (int i = 0; i < selectedCombos.size(); i++) {
+                Combo c = selectedCombos.get(i);
+                comboString.append(c.getName()).append(" x").append(c.getQuantity());
+                if (i < selectedCombos.size() - 1) comboString.append(", ");
+            }
+        } else {
+            comboString.append("Không có");
+        }
+
+        String paymentMethod = "Trực tuyến";
+        if (rbMomo.isChecked()) paymentMethod = "MoMo";
+        else if (rbATM.isChecked()) paymentMethod = "Thẻ ATM";
+        else if (rbVisa.isChecked()) paymentMethod = "Thẻ Visa";
+
+        Map<String, Object> bookingData = new HashMap<>();
+        bookingData.put("orderId", currentOrderId);
+        bookingData.put("userId", userId);
+        bookingData.put("movieTitle", title != null ? title : "");
+        bookingData.put("showTime", (time != null ? time : "") + " - " + (date != null ? date : ""));
+        bookingData.put("hallId", hallId != null ? hallId : "");
+        bookingData.put("seats", seats != null ? TextUtils.join(", ", seats) : "");
+        bookingData.put("combos", comboString.toString()); // Lưu thẳng danh sách Combo đã gộp
+        bookingData.put("totalPrice", totalAmount);
+        bookingData.put("paymentMethod", paymentMethod);
+        bookingData.put("status", "Đã thanh toán");
+        bookingData.put("createdAt", FieldValue.serverTimestamp());
+
+        db.collection("Booking").document(currentOrderId).set(bookingData)
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi khi lưu đơn hàng lên hệ thống", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void sendEmailConfirmation(String orderInfo) {
