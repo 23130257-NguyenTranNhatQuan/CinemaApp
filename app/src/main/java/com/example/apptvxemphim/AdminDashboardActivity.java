@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminDashboardActivity extends AppCompatActivity {
 
-    private CardView cardMovies, cardCinemas, cardCombos, cardTickets, cardUsers, cardStats, cardHalls, cardNews;
+    private CardView cardMovies, cardCinemas, cardCombos, cardTickets, cardUsers, cardStats, cardHalls, cardShowtimes, cardNews;
     private Button btnLogout, btnHome;
 
     @Override
@@ -23,6 +23,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         cardCinemas = findViewById(R.id.card_manage_cinemas);
         cardCombos = findViewById(R.id.card_manage_combos);
         cardHalls = findViewById(R.id.card_manage_halls);
+        cardShowtimes = findViewById(R.id.card_manage_showtimes);
         cardTickets = findViewById(R.id.card_manage_tickets);
         cardUsers = findViewById(R.id.card_manage_users);
         cardStats = findViewById(R.id.card_statistics);
@@ -54,6 +55,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
             startActivity(intent);
             Toast.makeText(this, "Đang mở Quản lý Phòng chiếu...", Toast.LENGTH_SHORT).show();
         });
+
+        cardShowtimes.setOnClickListener(v ->
+                startActivity(new Intent(AdminDashboardActivity.this, ManageShowtimesActivity.class)));
 
         cardTickets.setOnClickListener(v -> {
             Toast.makeText(this, "Đang mở Quản lý Vé...", Toast.LENGTH_SHORT).show();

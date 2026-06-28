@@ -77,6 +77,8 @@
         <activity android:name=".CinemaShowtimeActivity" />
         <activity android:name=".ManageNewsActivity" />
         <activity android:name=".AddEditNewsActivity" />
+        <activity android:name=".ManageShowtimesActivity" />
+        <activity android:name=".AddEditShowtimeActivity" />
 
     </application>
 
