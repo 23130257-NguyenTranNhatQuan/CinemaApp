@@ -9,7 +9,7 @@ public class Showtime {
     private String date;
     private String time;
     private String language;
-    private long price;
+
 
     public Showtime() {}
 
@@ -28,6 +28,5 @@ public class Showtime {
     public void setTime(String v) { time = v; }
     public String getLanguage() { return language; }
     public void setLanguage(String v) { language = v; }
-    public long getPrice() { return price; }
-    public void setPrice(long v) { price = v; }
+
 }
