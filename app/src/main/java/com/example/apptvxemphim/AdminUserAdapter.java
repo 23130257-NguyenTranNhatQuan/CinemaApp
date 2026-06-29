@@ -17,6 +17,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
     public interface OnUserActionListener {
         void onRoleChange(UserAccount user);
         void onBanUnban(UserAccount user);
+        void onDeleteUser(UserAccount user);
     }
 
     public AdminUserAdapter(List<UserAccount> userList, OnUserActionListener listener) {
@@ -79,6 +80,12 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
                 listener.onBanUnban(user);
             }
         });
+
+        holder.btnDeleteUser.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onDeleteUser(user);
+            }
+        });
     }
 
     @Override
@@ -88,7 +95,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvEmail, tvPhone, tvRole;
-        Button btnChangeRole, btnBanUnban;
+        Button btnChangeRole, btnBanUnban, btnDeleteUser;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -98,6 +105,7 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.View
             tvRole = itemView.findViewById(R.id.tv_admin_user_role);
             btnChangeRole = itemView.findViewById(R.id.btn_change_role);
             btnBanUnban = itemView.findViewById(R.id.btn_ban_unban);
+            btnDeleteUser = itemView.findViewById(R.id.btn_delete_user);
         }
     }
 }

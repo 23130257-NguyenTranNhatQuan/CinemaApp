@@ -84,5 +84,17 @@
             android:paddingHorizontal="8dp"
             android:paddingVertical="2dp"
             android:layout_marginTop="4dp" />
+
+        <Button
+            android:id="@+id/btn_delete_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xóa"
+            android:textSize="10sp"
+            android:backgroundTint="#FF4444"
+            android:textColor="@color/white"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="2dp"
+            android:layout_marginTop="4dp" />
     </LinearLayout>
 </LinearLayout>
