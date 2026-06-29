@@ -71,7 +71,8 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Xử lý nút xem lịch sử
         btnViewHistory.setOnClickListener(v -> {
-            Toast.makeText(ProfileActivity.this, "Chức năng Lịch sử đang phát triển...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ProfileActivity.this, HistoryActivity.class);
+            startActivity(intent);
         });
 
         // Xử lý nút Đăng xuất an toàn
