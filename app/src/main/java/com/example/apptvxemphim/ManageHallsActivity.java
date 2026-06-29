@@ -22,6 +22,8 @@ public class ManageHallsActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
     private Spinner spinnerCinema;
+
+    private java.util.Map<String, String> cinemaNameMap = new java.util.HashMap<>();
     private List<Cinema> cinemaList = new ArrayList<>();
     private List<Hall> allHalls = new ArrayList<>(); // toàn bộ hall load từ Firestore, chưa filter
 
@@ -101,6 +103,7 @@ public class ManageHallsActivity extends AppCompatActivity {
             for (QueryDocumentSnapshot doc : snapshot) {
                 Cinema c = doc.toObject(Cinema.class);
                 cinemaList.add(c);
+                cinemaNameMap.put(c.getCinemaId(), c.getName() != null ? c.getName() : c.getCinemaId());
                 names.add(c.getName() != null ? c.getName() : c.getCinemaId());
             }
 
@@ -115,6 +118,7 @@ public class ManageHallsActivity extends AppCompatActivity {
             };
             cinemaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerCinema.setAdapter(cinemaAdapter);
+            adapter.setCinemaNameMap(cinemaNameMap);
             spinnerCinema.setSelection(0); // mặc định chọn "Tất cả rạp"
         });
     }
