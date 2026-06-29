@@ -17,10 +17,15 @@ public class AdminHallAdapter extends RecyclerView.Adapter<AdminHallAdapter.View
 
     private final List<Hall> hallList;
     private final OnHallClickListener listener;
-
+    private java.util.Map<String, String> cinemaNameMap = new java.util.HashMap<>();
     public AdminHallAdapter(List<Hall> hallList, OnHallClickListener listener) {
         this.hallList = hallList;
         this.listener = listener;
+    }
+
+    public void setCinemaNameMap(java.util.Map<String, String> map) {
+        this.cinemaNameMap = map;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -33,7 +38,10 @@ public class AdminHallAdapter extends RecyclerView.Adapter<AdminHallAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Hall hall = hallList.get(position);
-        holder.tvName.setText(hall.name != null ? hall.name : "(Chưa đặt tên)");
+        String cinemaName = cinemaNameMap.get(hall.cinemaId);
+        String displayName = (hall.name != null ? hall.name : "(Chưa đặt tên)")
+                + (cinemaName != null ? " - " + cinemaName : "");
+        holder.tvName.setText(displayName);
         holder.tvInfo.setText(hall.rows + " hàng x " + hall.cols + " cột"
                 + (hall.vipRows > 0 ? " · " + hall.vipRows + " hàng VIP" : "")
                 + (hall.coupleRows > 0 ? " · " + hall.coupleRows + " hàng đôi" : ""));
