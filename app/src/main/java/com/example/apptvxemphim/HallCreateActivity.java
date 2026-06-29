@@ -1,6 +1,7 @@
 package com.example.apptvxemphim;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,20 +46,45 @@ public class HallCreateActivity extends AppCompatActivity {
         db.collection("Cinema").get().addOnSuccessListener(snapshot -> {
             cinemaList.clear();
             List<String> names = new ArrayList<>();
+
+            cinemaList.add(null);          // null = placeholder "Chọn rạp"
+            names.add("Chọn rạp");
+
             for (QueryDocumentSnapshot doc : snapshot) {
                 Cinema c = doc.toObject(Cinema.class);
                 cinemaList.add(c);
                 names.add(c.getName() != null ? c.getName() : c.getCinemaId());
             }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, names);
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_spinner_item, names) {
+                @Override
+                public View getView(int position, View convertView, android.view.ViewGroup parent) {
+                    View v = super.getView(position, convertView, parent);
+                    ((android.widget.TextView) v).setTextColor(getResources().getColor(R.color.white));
+                    return v;
+                }
+            };
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerCinema.setAdapter(adapter);
+
+            android.graphics.drawable.GradientDrawable spinnerBg = new android.graphics.drawable.GradientDrawable();
+            spinnerBg.setColor(android.graphics.Color.parseColor("#222222"));
+            spinnerBg.setCornerRadius(24f);
+            spinnerBg.setStroke(2, android.graphics.Color.parseColor("#C9227A"));
+            findViewById(R.id.container_spinner_cinema_create).setBackground(spinnerBg);
+
         }).addOnFailureListener(e ->
                 Toast.makeText(this, "Lỗi tải danh sách rạp: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void generateHall() {
-        if (cinemaList.isEmpty()) {
+        if (cinemaList.isEmpty() || cinemaList.size() <= 1) {
             Toast.makeText(this, "Chưa có rạp nào, vui lòng tạo rạp trước", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int cinemaPos = spinnerCinema.getSelectedItemPosition();
+        if (cinemaPos <= 0) {
+            Toast.makeText(this, "Vui lòng chọn rạp", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -83,7 +109,7 @@ public class HallCreateActivity extends AppCompatActivity {
             return;
         }
 
-        Cinema selectedCinema = cinemaList.get(spinnerCinema.getSelectedItemPosition());
+        Cinema selectedCinema = cinemaList.get(cinemaPos);
 
         Hall hall = new Hall(name, rows, cols, vipRows, coupleRows);
         hall.cinemaId = selectedCinema.getCinemaId();

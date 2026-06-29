@@ -19,6 +19,10 @@ public class HallEditActivity extends AppCompatActivity {
     private Hall hall;
     private boolean zoneSelectOn = false;
 
+    private Button btnPaintNormal, btnPaintVip, btnPaintCouple, btnPaintEmpty;
+    private TextView tvHallLabel;
+    private int currentPaintType = 1; // mặc định: Thường
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +35,18 @@ public class HallEditActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save_hall);
         tvHint = findViewById(R.id.tv_edit_hint);
 
+        tvHallLabel = findViewById(R.id.tv_hall_label);
+        btnPaintNormal = findViewById(R.id.btn_paint_normal);
+        btnPaintVip = findViewById(R.id.btn_paint_vip);
+        btnPaintCouple = findViewById(R.id.btn_paint_couple);
+        btnPaintEmpty = findViewById(R.id.btn_paint_empty);
+
+        btnPaintNormal.setOnClickListener(v -> selectPaintType(1));
+        btnPaintVip.setOnClickListener(v -> selectPaintType(2));
+        btnPaintCouple.setOnClickListener(v -> selectPaintType(3));
+        btnPaintEmpty.setOnClickListener(v -> selectPaintType(0));
+        selectPaintType(1); // mặc định chọn Thường lúc mở màn
+
         findViewById(R.id.btn_back_hall_edit).setOnClickListener(v -> finish());
 
         seatMapView.setEditMode(true);
@@ -41,7 +57,7 @@ public class HallEditActivity extends AppCompatActivity {
         loadHall(hallId);
 
         // Tap 1 ghế -> hiện dialog chọn loại
-        seatMapView.setOnSeatEditListener(seat -> showSeatTypeDialog(seat));
+        seatMapView.setOnSeatEditListener(seat -> seatMapView.updateSeatType(seat, currentPaintType));
 
         // Kéo chọn vùng trung tâm xong -> lưu tạm vào hall (chưa ghi Firestore, đợi bấm Save)
         seatMapView.setOnCenterZoneChangeListener((startRow, endRow, startCol, endCol) -> {
@@ -56,9 +72,10 @@ public class HallEditActivity extends AppCompatActivity {
             zoneSelectOn = !zoneSelectOn;
             seatMapView.setZoneSelectMode(zoneSelectOn);
             btnToggleZoneSelect.setText(zoneSelectOn ? "Đang chọn vùng trung tâm (bấm để xong)" : "Chọn vùng trung tâm");
-            tvHint.setText(zoneSelectOn
-                    ? "Vuốt tay trên lưới ghế để chọn vùng trung tâm hình chữ nhật"
-                    : "Bấm vào 1 ghế để đổi loại (Thường / VIP / Đôi / Trống)");
+
+                    tvHint.setText(zoneSelectOn
+                            ? "Chạm vào ghế ở góc 1, rồi chạm vào ghế ở góc đối diện để chọn vùng"
+                            : "Chọn loại ghế ở thanh dưới, rồi chạm/kéo qua nhiều ghế để đổi loại");
         });
 
         btnSave.setOnClickListener(v -> saveOverrides(hallId));
@@ -69,6 +86,12 @@ public class HallEditActivity extends AppCompatActivity {
                 .addOnSuccessListener(hallDoc -> {
                     if (!hallDoc.exists()) { finish(); return; }
                     hall = Hall.fromDocument(hallDoc);
+
+                    db.collection("Cinema").document(hall.cinemaId != null ? hall.cinemaId : "").get()
+                            .addOnSuccessListener(cinemaDoc -> {
+                                String cinemaName = cinemaDoc.getString("name") != null ? cinemaDoc.getString("name") : "Rạp";
+                                tvHallLabel.setText(hall.name + " - " + cinemaName);
+                            });
 
                     db.collection("HallOverrides").document(hallId).get()
                             .addOnSuccessListener(overrideDoc -> {
@@ -88,17 +111,7 @@ public class HallEditActivity extends AppCompatActivity {
                         Toast.makeText(this, "Lỗi tải phòng: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
-    private void showSeatTypeDialog(SeatMapView.Seat seat) {
-        String[] options = {"NORMAL (Thường)", "VIP", "COUPLE (Đôi)", "EMPTY (Trống)"};
-        int[] typeValues = {1, 2, 3, 0};
 
-        new AlertDialog.Builder(this)
-                .setTitle("Ghế " + seat.name)
-                .setItems(options, (dialog, which) -> {
-                    seatMapView.updateSeatType(seat, typeValues[which]);
-                })
-                .show();
-    }
 
     private void saveOverrides(String hallId) {
         Map<String, Integer> overrides = seatMapView.computeOverridesToSave(hall);
@@ -126,4 +139,13 @@ public class HallEditActivity extends AppCompatActivity {
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Lỗi lưu: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
+    private void selectPaintType(int type) {
+        currentPaintType = type;
+        btnPaintNormal.setAlpha(type == 1 ? 1f : 0.4f);
+        btnPaintVip.setAlpha(type == 2 ? 1f : 0.4f);
+        btnPaintCouple.setAlpha(type == 3 ? 1f : 0.4f);
+        btnPaintEmpty.setAlpha(type == 0 ? 1f : 0.4f);
+    }
+
 }

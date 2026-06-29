@@ -59,13 +59,15 @@ public class SeatMapView extends View {
     // Vùng trung tâm hiện tại (để vẽ + cho phép sửa)
     private Integer czStartRow, czEndRow, czStartCol, czEndCol;
     // Toạ độ kéo tạm trong lúc đang vuốt chọn vùng
-    private int dragStartRow = -1, dragStartCol = -1, dragEndRow = -1, dragEndCol = -1;
-    private boolean isDragging = false;
+
+    private Seat lastPaintedSeat = null; // tránh sơn lại liên tục cùng 1 ghế khi đang kéo tay
+    private Integer firstTapRow = null, firstTapCol = null; // điểm chạm đầu tiên khi chọn vùng (chờ chạm điểm thứ 2)
 
     private Paint paintSeat = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint paintBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint paintDragZone = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint paintConfirmedZone = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private float seatSize = 0;
     private final float seatGap = 2;
@@ -89,6 +91,9 @@ public class SeatMapView extends View {
 
         paintDragZone.setColor(Color.parseColor("#5500BFFF"));
         paintDragZone.setStyle(Paint.Style.FILL);
+
+        paintConfirmedZone.setColor(Color.parseColor("#664CAF50")); // xanh lá, mờ 40%
+        paintConfirmedZone.setStyle(Paint.Style.FILL);
     }
 
     // ===== API thiết lập dữ liệu =====
@@ -142,7 +147,8 @@ public class SeatMapView extends View {
     public void setEditMode(boolean editMode) { this.editMode = editMode; }
     public void setZoneSelectMode(boolean zoneSelectMode) {
         this.zoneSelectMode = zoneSelectMode;
-        isDragging = false;
+        firstTapRow = null;
+        firstTapCol = null;
         invalidate();
     }
 
@@ -258,16 +264,15 @@ public class SeatMapView extends View {
         }
         // Vẽ vùng trung tâm nếu có
         if (czStartRow != null) {
+            drawZoneRect(canvas, czStartRow, czEndRow, czStartCol, czEndCol, paintConfirmedZone, true);
             drawZoneRect(canvas, czStartRow, czEndRow, czStartCol, czEndCol, paintBorder, false);
         }
 
-        // Vẽ vùng đang kéo chọn (preview)
-        if (zoneSelectMode && isDragging) {
-            int sr = Math.min(dragStartRow, dragEndRow);
-            int er = Math.max(dragStartRow, dragEndRow);
-            int sc = Math.min(dragStartCol, dragEndCol);
-            int ec = Math.max(dragStartCol, dragEndCol);
-            drawZoneRect(canvas, sr, er, sc, ec, paintDragZone, true);
+        // Đánh dấu điểm đầu tiên đã chạm, đang chờ chạm điểm thứ 2 để hoàn tất vùng
+        if (zoneSelectMode && firstTapRow != null) {
+            float cx = offsetX + firstTapCol * (seatSize + seatGap) + seatSize / 2f;
+            float cy = paddingTop + firstTapRow * (seatSize + rowGap) + seatSize / 2f;
+            canvas.drawCircle(cx, cy, seatSize * 0.45f, paintDragZone);
         }
     }
 
@@ -299,38 +304,55 @@ public class SeatMapView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (zoneSelectMode) {
-            handleZoneDrag(event);
+            handleZoneTap(event);
             return true;
         }
+
+        if (editMode) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    lastPaintedSeat = null; // bắt đầu lượt chạm/kéo mới
+                    paintSeatAt(event.getX(), event.getY());
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    paintSeatAt(event.getX(), event.getY());
+                    break;
+            }
+            return true;
+        }
+
         if (event.getPointerCount() == 1 && event.getAction() == MotionEvent.ACTION_UP) {
             handleSeatTap(event.getX(), event.getY());
         }
         return true;
     }
 
-    private void handleZoneDrag(MotionEvent event) {
+    private void paintSeatAt(float x, float y) {
+        Seat seat = findSeatAt(x, y);
+        if (seat == null || seat == lastPaintedSeat) return;
+        lastPaintedSeat = seat;
+        if (editListener != null) editListener.onSeatTapped(seat);
+        invalidate();
+    }
+
+    private void handleZoneTap(MotionEvent event) {
+        if (event.getAction() != MotionEvent.ACTION_UP) return;
         int[] rc = coordToRowCol(event.getX(), event.getY());
         if (rc == null) return;
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                dragStartRow = rc[0]; dragStartCol = rc[1];
-                dragEndRow = rc[0]; dragEndCol = rc[1];
-                isDragging = true;
-                invalidate();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                dragEndRow = rc[0]; dragEndCol = rc[1];
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-                isDragging = false;
-                czStartRow = Math.min(dragStartRow, dragEndRow);
-                czEndRow = Math.max(dragStartRow, dragEndRow);
-                czStartCol = Math.min(dragStartCol, dragEndCol);
-                czEndCol = Math.max(dragStartCol, dragEndCol);
-                invalidate();
-                if (zoneListener != null) zoneListener.onCenterZoneChanged(czStartRow, czEndRow, czStartCol, czEndCol);
-                break;
+
+        if (firstTapRow == null) {
+            firstTapRow = rc[0];
+            firstTapCol = rc[1];
+            invalidate(); // vẽ marker điểm đầu tiên đã chọn
+        } else {
+            czStartRow = Math.min(firstTapRow, rc[0]);
+            czEndRow = Math.max(firstTapRow, rc[0]);
+            czStartCol = Math.min(firstTapCol, rc[1]);
+            czEndCol = Math.max(firstTapCol, rc[1]);
+            firstTapRow = null;
+            firstTapCol = null;
+            invalidate();
+            if (zoneListener != null) zoneListener.onCenterZoneChanged(czStartRow, czEndRow, czStartCol, czEndCol);
         }
     }
 
@@ -347,16 +369,25 @@ public class SeatMapView extends View {
     }
 
     private void handleSeatTap(float x, float y) {
+        Seat seat = findSeatAt(x, y);
+        if (seat == null || seat.isBooked) return;
+        if (seat.type == 3) {
+            toggleDoubleSeat(seat);
+        } else {
+            seat.isSelected = !seat.isSelected;
+        }
+        invalidate();
+        notifyListener();
+    }
+
+    private Seat findSeatAt(float x, float y) {
         for (Seat seat : seatList) {
-            if (!editMode && seat.isBooked) continue;
             if (seat.type == 3 && isSecondOfCouple(seat)) continue;
 
             float left = offsetX + seat.col * (seatSize + seatGap);
             float top = paddingTop + seat.row * (seatSize + rowGap);
-            // Ghế đôi: right chỉ kéo đến hết col kế tiếp THỰC SỰ
             float right;
             if (seat.type == 3) {
-                // Tìm partner để tính right chính xác
                 right = offsetX + (seat.col + 2) * (seatSize + seatGap) - seatGap;
             } else {
                 right = left + seatSize;
@@ -364,21 +395,10 @@ public class SeatMapView extends View {
             float bottom = top + seatSize;
 
             if (x >= left && x <= right && y >= top && y <= bottom) {
-                if (editMode) {
-                    if (editListener != null) editListener.onSeatTapped(seat);
-                    invalidate();
-                } else {
-                    if (seat.type == 3) {
-                        toggleDoubleSeat(seat);
-                    } else {
-                        seat.isSelected = !seat.isSelected;
-                    }
-                    invalidate();
-                    notifyListener();
-                }
-                return;
+                return seat;
             }
         }
+        return null;
     }
 
     private void toggleDoubleSeat(Seat tapped) {
