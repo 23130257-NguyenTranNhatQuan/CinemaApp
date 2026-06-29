@@ -12,6 +12,7 @@ public class AdminHallAdapter extends RecyclerView.Adapter<AdminHallAdapter.View
 
     public interface OnHallClickListener {
         void onHallClick(Hall hall);
+        void onDeleteClick(Hall hall);
     }
 
     private final List<Hall> hallList;
@@ -39,6 +40,12 @@ public class AdminHallAdapter extends RecyclerView.Adapter<AdminHallAdapter.View
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) listener.onHallClick(hall);
         });
+        holder.btnEdit.setOnClickListener(v -> {
+            if (listener != null) listener.onHallClick(hall);
+        });
+        holder.btnDelete.setOnClickListener(v -> {
+            if (listener != null) listener.onDeleteClick(hall);
+        });
     }
 
     @Override
@@ -46,10 +53,13 @@ public class AdminHallAdapter extends RecyclerView.Adapter<AdminHallAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvInfo;
+        View btnEdit, btnDelete;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tv_admin_hall_name);
             tvInfo = itemView.findViewById(R.id.tv_admin_hall_info);
+            btnEdit = itemView.findViewById(R.id.btn_edit_hall);
+            btnDelete = itemView.findViewById(R.id.btn_delete_hall);
         }
     }
 }
