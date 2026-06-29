@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class ManageUsersActivity extends AppCompatActivity {
     private AdminUserAdapter adapter;
     private List<UserAccount> userList;
     private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,7 @@ public class ManageUsersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manage_users);
 
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         findViewById(R.id.btn_back_admin_users).setOnClickListener(v -> finish());
 
@@ -43,6 +46,11 @@ public class ManageUsersActivity extends AppCompatActivity {
             @Override
             public void onBanUnban(UserAccount user) {
                 toggleBanStatus(user);
+            }
+
+            @Override
+            public void onDeleteUser(UserAccount user) {
+                showDeleteUserDialog(user);
             }
         });
         rcvUsers.setLayoutManager(new LinearLayoutManager(this));
@@ -113,7 +121,6 @@ public class ManageUsersActivity extends AppCompatActivity {
 
     private void toggleBanStatus(UserAccount user) {
         boolean newBanStatus = !user.isBanned();
-        String action = newBanStatus ? "ban" : "unban";
 
         db.collection("User").document(user.getId())
                 .update("banned", newBanStatus)
@@ -125,6 +132,75 @@ public class ManageUsersActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void showDeleteUserDialog(UserAccount user) {
+        String displayName = user.getFullName();
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = user.getUser();
+        }
+        if (displayName == null || displayName.isEmpty()) {
+            displayName = user.getEmail();
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Xóa người dùng");
+        builder.setMessage("Bạn có chắc chắn muốn xóa người dùng \"" + displayName + "\"?\nHành động này không thể hoàn tác.");
+        builder.setPositiveButton("Xóa", (dialog, which) -> {
+            deleteUser(user);
+        });
+        builder.setNegativeButton("Hủy", null);
+        builder.show();
+    }
+
+    private void deleteUser(UserAccount user) {
+        // Kiểm tra user có tồn tại trong Firebase Auth không
+        mAuth.fetchSignInMethodsForEmail(user.getEmail())
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        var signInMethods = task.getResult().getSignInMethods();
+                        boolean existsInAuth = signInMethods != null && !signInMethods.isEmpty();
+                        
+                        if (existsInAuth) {
+                            // User tồn tại trong Auth: đánh dấu là đã xóa (không xóa thật vì cần Admin SDK)
+                            String disabledEmail = user.getEmail() + ".deleted_" + System.currentTimeMillis();
+                            db.collection("User").document(user.getId())
+                                    .update("email", disabledEmail, "disabled", true)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(this, "Đã xóa người dùng (email đã bị vô hiệu hóa)", Toast.LENGTH_SHORT).show();
+                                        userList.remove(user);
+                                        adapter.notifyDataSetChanged();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            // User không tồn tại trong Auth: xóa hoàn toàn khỏi Firestore
+                            db.collection("User").document(user.getId())
+                                    .delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(this, "Đã xóa người dùng", Toast.LENGTH_SHORT).show();
+                                        userList.remove(user);
+                                        adapter.notifyDataSetChanged();
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    } else {
+                        // Lỗi kiểm tra Auth: vẫn xóa khỏi Firestore
+                        db.collection("User").document(user.getId())
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Đã xóa người dùng", Toast.LENGTH_SHORT).show();
+                                    userList.remove(user);
+                                    adapter.notifyDataSetChanged();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Lỗi xóa: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    }
                 });
     }
 }

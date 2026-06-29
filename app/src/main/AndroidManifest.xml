@@ -79,6 +79,7 @@
         <activity android:name=".AddEditNewsActivity" />
         <activity android:name=".ManageShowtimesActivity" />
         <activity android:name=".AddEditShowtimeActivity" />
+        <activity android:name=".VerifyOtpActivity" />
 
     </application>
 
