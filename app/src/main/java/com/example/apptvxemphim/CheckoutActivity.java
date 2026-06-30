@@ -232,8 +232,8 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void sendEmailConfirmation(String orderInfo) {
-        final String senderEmail = "nhatquanqn2005@gmail.com";
-        final String senderPassword = "kuar cvkz zdmf ddqq";
+        final String senderEmail = "nguyenquannq2275@gmail.com";
+        final String senderPassword = "mkla lzdj qfgz vudi";
         String recipientEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
         new Thread(() -> {
