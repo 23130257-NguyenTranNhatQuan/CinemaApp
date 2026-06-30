@@ -60,6 +60,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 startActivity(new Intent(AdminDashboardActivity.this, ManageShowtimesActivity.class)));
 
         cardTickets.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, ManageBookingsActivity.class);
+            startActivity(intent);
             Toast.makeText(this, "Đang mở Quản lý Vé...", Toast.LENGTH_SHORT).show();
         });
 
@@ -76,6 +78,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
 
         cardStats.setOnClickListener(v -> {
+            Intent intent = new Intent(AdminDashboardActivity.this, StatisticsActivity.class);
+            startActivity(intent);
             Toast.makeText(this, "Đang mở Thống kê Doanh thu...", Toast.LENGTH_SHORT).show();
         });
 

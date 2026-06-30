@@ -77,6 +77,8 @@
         <activity android:name=".AddEditNewsActivity" />
         <activity android:name=".AddEditShowtimeActivity" />
         <activity android:name=".VerifyOtpActivity" />
+        <activity android:name=".ManageBookingsActivity" android:exported="false"/>
+        <activity android:name=".StatisticsActivity" android:exported="false" />
 
     </application>
 
