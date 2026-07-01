@@ -15,4 +15,6 @@
         <item>T16</item>
         <item>T18</item>
     </string-array>
+
+    <string name="google_maps_key">AIzaSyCmC2raRegwXcbUPor9srPgO3bkKjEWhog</string>
 </resources>
