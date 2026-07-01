@@ -35,13 +35,10 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
 
         String[] parts = ticketData.split("\n");
 
-        // 1. Ô Tên Phim (Dòng 1)
         holder.tvMovieTitle.setText(parts.length > 0 ? parts[0].trim() : "Không có thông tin");
 
-        // 2. Ô Thời gian & Rạp (Dòng 2)
         holder.tvCinemaAndTime.setText(parts.length > 1 ? parts[1].trim() : "Thời gian: ---");
 
-        // 3. Xử lý Dòng 3 (Ghế và Giá tiền)
         if (parts.length > 2) {
             String seatAndPriceSection = parts[2];
 
@@ -66,10 +63,9 @@ public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketView
             // Tạo Hộp thoại Popup (AlertDialog)
             new AlertDialog.Builder(context)
                     .setTitle("🎟️ Chi tiết vé phim")
-                    // Hiển thị toàn bộ chuỗi ticketData (chứa tất cả thông tin)
                     .setMessage(ticketData)
                     .setPositiveButton("Đóng", (dialog, which) -> {
-                        dialog.dismiss(); // Tắt hộp thoại khi ấn Đóng
+                        dialog.dismiss();
                     })
                     .show();
         });
