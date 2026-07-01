@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#6200EE"
+        android:padding="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quản Lý Đơn Đặt Vé"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/etSearchBooking"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:hint="Nhập mã đơn hàng..."
+            android:background="@drawable/bg_white_rounded"
+            android:padding="8dp"
+            android:layout_marginRight="8dp"/>
+
+        <Button
+            android:id="@+id/btnScanQR"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="QUÉT QR"
+            android:backgroundTint="#FF9800"
+            android:textColor="@color/white"/>
+    </LinearLayout>
+
+    <Spinner
+        android:id="@+id/spinnerFilterStatus"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_white_rounded"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBookings"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:clipToPadding="false"/>
+</LinearLayout>
