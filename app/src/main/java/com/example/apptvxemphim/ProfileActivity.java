@@ -29,7 +29,6 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Khởi tạo Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -41,11 +40,8 @@ public class ProfileActivity extends AppCompatActivity {
         dividerAdmin = findViewById(R.id.dividerAdmin);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        // Gọi hàm tải dữ liệu ngay khi vừa mở màn hình
         loadUserProfile();
 
-        // ---------------- XỬ LÝ BOTTOM NAVIGATION ---------------- //
-        // Bật sáng icon "Tài khoản" vì người dùng đang ở trang Profile
         bottomNavigationView.setSelectedItemId(R.id.nav_account);
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -67,15 +63,14 @@ public class ProfileActivity extends AppCompatActivity {
             }
             return false;
         });
-        // --------------------------------------------------------- //
 
-        // Xử lý nút xem lịch sử
+        // nút xem lịch sử
         btnViewHistory.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, HistoryActivity.class);
             startActivity(intent);
         });
 
-        // Xử lý nút Đăng xuất an toàn
+        // nút Đăng xuất an toàn
         btnLogout.setOnClickListener(v -> {
             mAuth.signOut();
             Toast.makeText(ProfileActivity.this, "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();
@@ -86,7 +81,7 @@ public class ProfileActivity extends AppCompatActivity {
             finish();
         });
 
-        // Xử lý nút Quản trị hệ thống (dành cho Admin)
+        // nút Quản trị hệ thống (dành cho Admin)
         btnAdminDashboard.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, AdminDashboardActivity.class);
             startActivity(intent);

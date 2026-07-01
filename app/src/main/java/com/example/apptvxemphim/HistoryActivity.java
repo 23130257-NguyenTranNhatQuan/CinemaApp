@@ -61,7 +61,6 @@ public class HistoryActivity extends AppCompatActivity {
 
         String currentUserId = mAuth.getCurrentUser().getUid();
 
-        // Đã xóa lệnh .orderBy(...) ở đây để Firebase không báo lỗi Index nữa
         db.collection("Booking")
                 .whereEqualTo("userId", currentUserId)
                 .get()
@@ -70,7 +69,7 @@ public class HistoryActivity extends AppCompatActivity {
                         ticketList.clear();
 
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            // 1. ĐỌC TẤT CẢ CÁC BIẾN TỪ FIREBASE (TRỪ USERID)
+                            // 1. ĐỌC TẤT CẢ CÁC BIẾN TỪ FIREBASE
                             String movieTitle = document.getString("movieTitle");
                             String orderId = document.getString("orderId");
                             String hallId = document.getString("hallId");
