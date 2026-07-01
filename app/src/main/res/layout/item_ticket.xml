@@ -62,6 +62,15 @@
                 android:textColor="#E91E63"
                 android:textSize="13sp"
                 android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/ivTicketQR"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:scaleType="centerCrop" />
         </androidx.cardview.widget.CardView>
 
         <TextView
