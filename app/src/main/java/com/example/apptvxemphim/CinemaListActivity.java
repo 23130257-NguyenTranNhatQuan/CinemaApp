@@ -36,6 +36,7 @@ public class CinemaListActivity extends AppCompatActivity {
             Intent intent = new Intent(this, CinemaShowtimeActivity.class);
             intent.putExtra("CINEMA_ID", cinema.getCinemaId());
             intent.putExtra("CINEMA_NAME", cinema.getName());
+            intent.putExtra("CINEMA_GGMAP", cinema.getGgmap());
             startActivity(intent);
         });
         rcvCinemas.setAdapter(cinemaAdapter);

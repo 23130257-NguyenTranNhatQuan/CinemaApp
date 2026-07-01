@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,6 +14,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import com.bumptech.glide.Glide;
 import android.widget.ImageView;
+import android.webkit.WebView;
+import android.webkit.WebSettings;
+import android.app.Dialog;
+import android.view.Window;
 public class ShowtimeSelectionActivity extends AppCompatActivity {
 
     LinearLayout layoutDateContainer;
@@ -363,6 +368,16 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
             infoCol.addView(tvAddr);
         }
 
+        if (cinema != null && cinema.getGgmap() != null && !cinema.getGgmap().isEmpty()) {
+            TextView tvMapLink = new TextView(this);
+            tvMapLink.setText("[ Bản đồ ]");
+            tvMapLink.setTextColor(Color.parseColor("#007AFF"));
+            tvMapLink.setTextSize(12);
+            tvMapLink.setPadding(0, dp(2), 0, 0);
+            tvMapLink.setOnClickListener(v -> showMapDialog(cinema.getGgmap()));
+            infoCol.addView(tvMapLink);
+        }
+
         headerRow.addView(ivLogo);
         headerRow.addView(infoCol);
         card.addView(headerRow);
@@ -490,9 +505,33 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
         }
     }
 
+    private void showMapDialog(String mapUrl) {
+        if (mapUrl == null || mapUrl.trim().isEmpty()) {
+            Toast.makeText(this, "Rạp này chưa có link bản đồ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_map);
+        dialog.getWindow().setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                (int) (getResources().getDisplayMetrics().heightPixels * 0.85));
 
+        WebView webView = dialog.findViewById(R.id.webview_map_dialog);
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        webView.setWebViewClient(new android.webkit.WebViewClient());
+        webView.loadUrl(mapUrl);
+
+        dialog.findViewById(R.id.btn_close_map).setOnClickListener(v -> dialog.dismiss());
+        dialog.findViewById(R.id.btn_close_map_bottom).setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
 
     private int dp(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density);
     }
+
+
 }
