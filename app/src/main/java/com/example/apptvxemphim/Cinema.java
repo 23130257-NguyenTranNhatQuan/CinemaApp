@@ -10,6 +10,8 @@ public class Cinema {
     private String phone;
     private String photo;
     private String ggmap;
+    private Double latitude;
+    private Double longitude;
 
     public Cinema() {}
 
@@ -31,5 +33,8 @@ public class Cinema {
     public void setPhoto(String v) { photo = v; }
     public String getGgmap() { return ggmap; }
     public void setGgmap(String v) { ggmap = v; }
-
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double v) { latitude = v; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double v) { longitude = v; }
 }

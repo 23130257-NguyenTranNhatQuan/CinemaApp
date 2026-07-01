@@ -14,10 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import com.bumptech.glide.Glide;
 import android.widget.ImageView;
-import android.webkit.WebView;
-import android.webkit.WebSettings;
-import android.app.Dialog;
-import android.view.Window;
+
 public class ShowtimeSelectionActivity extends AppCompatActivity {
 
     LinearLayout layoutDateContainer;
@@ -368,13 +365,20 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
             infoCol.addView(tvAddr);
         }
 
-        if (cinema != null && cinema.getGgmap() != null && !cinema.getGgmap().isEmpty()) {
+        if (cinema != null && cinema.getLatitude() != null && cinema.getLongitude() != null) {
             TextView tvMapLink = new TextView(this);
             tvMapLink.setText("[ Bản đồ ]");
             tvMapLink.setTextColor(Color.parseColor("#007AFF"));
             tvMapLink.setTextSize(12);
             tvMapLink.setPadding(0, dp(2), 0, 0);
-            tvMapLink.setOnClickListener(v -> showMapDialog(cinema.getGgmap()));
+            tvMapLink.setOnClickListener(v -> {
+                Intent intent = new Intent(this, CinemaMapActivity.class);
+                intent.putExtra("CINEMA_NAME", cinema.getName());
+                intent.putExtra("CINEMA_ADDRESS", cinema.getAddress());
+                intent.putExtra("CINEMA_LAT", cinema.getLatitude());
+                intent.putExtra("CINEMA_LNG", cinema.getLongitude());
+                startActivity(intent);
+            });
             infoCol.addView(tvMapLink);
         }
 
@@ -505,29 +509,7 @@ public class ShowtimeSelectionActivity extends AppCompatActivity {
         }
     }
 
-    private void showMapDialog(String mapUrl) {
-        if (mapUrl == null || mapUrl.trim().isEmpty()) {
-            Toast.makeText(this, "Rạp này chưa có link bản đồ", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_map);
-        dialog.getWindow().setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                (int) (getResources().getDisplayMetrics().heightPixels * 0.85));
 
-        WebView webView = dialog.findViewById(R.id.webview_map_dialog);
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        webView.setWebViewClient(new android.webkit.WebViewClient());
-        webView.loadUrl(mapUrl);
-
-        dialog.findViewById(R.id.btn_close_map).setOnClickListener(v -> dialog.dismiss());
-        dialog.findViewById(R.id.btn_close_map_bottom).setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
-    }
 
     private int dp(int dp) {
         return (int) (dp * getResources().getDisplayMetrics().density);
