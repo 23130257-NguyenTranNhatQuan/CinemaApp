@@ -1,9 +1,17 @@
 package com.example.apptvxemphim;
 
 import android.os.Bundle;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import android.location.Address;
+import android.location.Geocoder;
+import java.util.List;
+import java.util.Locale;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,14 +21,17 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AddEditCinemaActivity extends AppCompatActivity {
+public class AddEditCinemaActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private EditText etName, etAddress, etBrand, etLogo, etPhone, etPhoto, etGgmap;
-    private WebView webViewMap;
+    private TextView tvSelectedCoordinate;
     private Button btnSave;
     private TextView tvHeader;
     private String cinemaId = null;
     private FirebaseFirestore db;
+
+    private GoogleMap googleMap;
+    private Double selectedLat = null, selectedLng = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,26 +49,14 @@ public class AddEditCinemaActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.et_cinema_phone);
         etPhoto = findViewById(R.id.et_cinema_photo);
         etGgmap = findViewById(R.id.et_cinema_ggmap);
-        webViewMap = findViewById(R.id.webview_map);
+        tvSelectedCoordinate = findViewById(R.id.tv_selected_coordinate);
         btnSave = findViewById(R.id.btn_save_cinema);
 
-        // Setup WebView
-        WebSettings webSettings = webViewMap.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webViewMap.setWebViewClient(new WebViewClient());
-
-        // Load default map (HCM City center)
-        webViewMap.loadUrl("https://www.google.com/maps/@10.762622,106.660172,13z");
-
-        // Listen for URL changes in the EditText
-        etGgmap.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                String mapUrl = etGgmap.getText().toString().trim();
-                if (!mapUrl.isEmpty()) {
-                    webViewMap.loadUrl(mapUrl);
-                }
-            }
-        });
+        SupportMapFragment mapFragment = (SupportMapFragment)
+                getSupportFragmentManager().findFragmentById(R.id.mapPickerContainer);
+        if (mapFragment != null) mapFragment.getMapAsync(this);
+        Button btnSearchAddress = findViewById(R.id.btn_search_address);
+        btnSearchAddress.setOnClickListener(v -> searchAddressOnMap());
 
         // Kiểm tra xem có ID truyền sang không (Chế độ Sửa)
         cinemaId = getIntent().getStringExtra("CINEMA_ID");
@@ -83,10 +82,11 @@ public class AddEditCinemaActivity extends AppCompatActivity {
                     etPhone.setText(cinema.getPhone());
                     etPhoto.setText(cinema.getPhoto());
                     etGgmap.setText(cinema.getGgmap());
-                    
-                    // Load Google Maps if URL exists
-                    if (cinema.getGgmap() != null && !cinema.getGgmap().isEmpty()) {
-                        webViewMap.loadUrl(cinema.getGgmap());
+
+                    if (cinema.getLatitude() != null && cinema.getLongitude() != null) {
+                        selectedLat = cinema.getLatitude();
+                        selectedLng = cinema.getLongitude();
+                        if (googleMap != null) placeMarker(selectedLat, selectedLng);
                     }
                 }
             }
@@ -112,6 +112,13 @@ public class AddEditCinemaActivity extends AppCompatActivity {
         cinemaData.put("phone", etPhone.getText().toString().trim());
         cinemaData.put("photo", etPhoto.getText().toString().trim());
         cinemaData.put("ggmap", etGgmap.getText().toString().trim());
+        if (selectedLat != null && selectedLng != null) {
+            cinemaData.put("latitude", selectedLat);
+            cinemaData.put("longitude", selectedLng);
+        } else {
+            Toast.makeText(this, "Chưa chọn vị trí trên bản đồ!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (cinemaId == null) {
             // Chế độ Thêm Mới
@@ -133,6 +140,58 @@ public class AddEditCinemaActivity extends AppCompatActivity {
                     .addOnFailureListener(e -> {
                         Toast.makeText(this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        this.googleMap = map;
+        LatLng defaultPos = new LatLng(10.762622, 106.660172); // Trung tâm TP.HCM
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultPos, 12f));
+
+        // Nếu đang sửa rạp đã có tọa độ, load lại sau khi loadCinemaData() chạy xong
+        if (selectedLat != null && selectedLng != null) {
+            placeMarker(selectedLat, selectedLng);
+        }
+
+        map.setOnMapClickListener(latLng -> {
+            selectedLat = latLng.latitude;
+            selectedLng = latLng.longitude;
+            placeMarker(selectedLat, selectedLng);
+        });
+    }
+
+    private void placeMarker(double lat, double lng) {
+        if (googleMap == null) return;
+        googleMap.clear();
+        LatLng pos = new LatLng(lat, lng);
+        googleMap.addMarker(new MarkerOptions().position(pos));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 16f));
+        tvSelectedCoordinate.setText(String.format("Đã chọn: %.6f, %.6f", lat, lng));
+    }
+    private void searchAddressOnMap() {
+        String query = etAddress.getText().toString().trim();
+        if (query.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập Địa chỉ trước khi tìm", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (googleMap == null) {
+            Toast.makeText(this, "Bản đồ chưa sẵn sàng, thử lại sau", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            List<Address> results = geocoder.getFromLocationName(query, 1);
+            if (results != null && !results.isEmpty()) {
+                Address address = results.get(0);
+                LatLng pos = new LatLng(address.getLatitude(), address.getLongitude());
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(pos, 16f));
+                Toast.makeText(this, "Đã tìm thấy khu vực, chạm vào bản đồ để chọn đúng vị trí rạp", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Không tìm thấy địa chỉ này, thử nhập rõ hơn (kèm quận/thành phố)", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi tìm kiếm: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }
