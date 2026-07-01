@@ -1,127 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="@color/white">
 
-    <!-- Header -->
+    <!-- Toolbar -->
     <LinearLayout
+        android:id="@+id/toolbar_manage_showtime"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="#4A2B73"
-        android:gravity="center_vertical">
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/purple_cinestar"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/btn_back_showtimes"
+        <ImageView
+            android:id="@+id/btn_back_showtime"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:padding="8dp"
             android:src="@android:drawable/ic_menu_revert"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:tint="#FFFFFF" />
+            app:tint="@color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quản lý suất chiếu"
-            android:textColor="#FFFFFF"
+            android:text="Quản lý Suất chiếu"
+            android:textColor="@color/white"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginStart="16dp" />
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Selection Panel -->
+    <!-- Filter bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="#FFFFFF"
-        android:elevation="2dp">
+        android:orientation="vertical"
+        android:background="#F5F5F5"
+        android:padding="10dp">
 
+        <!-- Hàng 1: Phim + Rạp -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phim:"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:minWidth="40dp"/>
+
+            <Spinner
+                android:id="@+id/spinner_filter_movie"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_input"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Rạp:"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_selected_cinema"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Chọn rạp"
-                android:textColor="#000000"
-                android:textSize="14sp"
                 android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:drawableEnd="@android:drawable/arrow_down_float" />
+                android:textSize="13sp"
+                android:minWidth="36dp"/>
+
+            <Spinner
+                android:id="@+id/spinner_filter_cinema"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_input"/>
         </LinearLayout>
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_marginHorizontal="16dp"
-            android:background="#E0E0E0" />
-
+        <!-- Hàng 2: Ngày + Phòng + FAB -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ngày:"
-                android:textColor="#666666"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tv_selected_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="dd/mm/yyyy"
-                android:textColor="#000000"
-                android:textSize="14sp"
                 android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:drawableEnd="@android:drawable/arrow_down_float" />
+                android:textSize="13sp"
+                android:minWidth="40dp"/>
+
+            <Button
+                android:id="@+id/btn_filter_date"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_weight="1"
+                android:text="Tất cả"
+                android:textSize="11sp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="@color/purple_cinestar"
+                android:textColor="@color/white"/>
+
+            <Spinner
+                android:id="@+id/spinner_filter_hall"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_input"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab_add_showtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@android:drawable/ic_input_add"
+                app:backgroundTint="@color/primary_pink"
+                app:tint="@color/white"
+                app:fabSize="mini"/>
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Showtimes List -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DDDDDD"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv_showtimes"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp"
-        android:clipToPadding="false" />
-
-    <!-- Add Showtime Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btn_add_showtime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_input_add"
-        android:backgroundTint="#4A2B73"
-        android:tint="#FFFFFF" />
+        android:paddingTop="8dp"/>
 
 </LinearLayout>
